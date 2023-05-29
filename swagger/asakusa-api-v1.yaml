@@ -1,0 +1,249 @@
+openapi: 3.0.3
+info:
+  title: Asakusa API
+  version: "1.0.0"
+
+servers:
+  - url: http://localhost:8085
+
+paths: {}
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        password:
+          type: string
+          format: password
+          writeOnly: true
+          minLength: 8
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        picture:
+          type: string
+      required:
+        - email
+        - first_name
+        - last_name
+
+    Team:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+      required:
+        - name
+        
+    Project:
+      type: object
+      properties:
+        id: 
+          type: string
+          readOnly: true
+        name:
+          type: string
+        description:
+          type: string
+        team_id:
+          type: string
+        owner_id:
+          type: string
+        start_date:
+          type: string
+          format: date-time
+        deadline:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+        capacity:
+          type: integer
+        status:
+          type: string
+          default: todo
+          enum:
+            - todo
+            - in_progress
+            - paused
+            - blocked
+            - testing
+            - done
+        priority:
+          type: string
+          default: medium
+          enum:
+            - low
+            - medium
+            - high
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+      required:
+        - name
+        - team_id
+            
+    Task:
+      type: object
+      properties:
+        id: 
+          type: string
+          readOnly: true
+        title:
+          type: string
+        description:
+          type: string
+        project_id:
+          type: string
+        assignee_id:
+          type: string
+        start_date:
+          type: string
+          format: date-time
+        estimated_duration:
+          type: integer
+          minimum: 1
+        end_date:
+          type: string
+          format: date-time
+        status:
+          type: string
+          default: todo
+          enum:
+            - todo
+            - in_progress
+            - blocked
+            - complete
+        priority:
+          type: string
+          default: medium
+          enum:
+            - low
+            - medium
+            - high
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tag'
+      required:
+        - title
+        - project_id
+          
+    Discussion:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        author_id:
+          type: string
+        title:
+          type: string
+      required:
+        - author_id
+        - title
+        
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        sender_id:
+          type: string
+        body:
+          type: string
+      required:
+        - sender_id
+          
+    Media:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+        title:
+          type: string
+        thumbnail:
+          type: string
+        url:
+          type: string
+        type:
+          type: string
+          default: image
+          enum:
+            - image
+            - document
+            - audio
+            - video
+            - other
+      required:
+        - url
+          
+    Tag:
+      type: object
+      properties:
+        name:
+          type: string
+        color_code:
+          type: string
+  
+    OASError:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Human-readable error message
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              path:
+                type: string
+                description: |
+                  For input validation errors, identifies where in the JSON
+                  request body the error occurred
+              message:
+                type: string
+                description: Humna-readable error message
+              errorCode:
+                type: string
+                description: Code indicating error type
+
+    Problem:
+      type: object
+      properties:
+        type:
+          type: string
+          description: URI indicating error type
+        title:
+          type: string
+          description: Human-readable error title
+        status:
+          type: integer
+          description: HTTP status code
+        detail:
+          type: string
+          description: Human-readable error details
+        instance:
+          type: string
+          description: URI indicating error instance
+  
