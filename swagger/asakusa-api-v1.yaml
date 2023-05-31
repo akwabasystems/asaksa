@@ -2,20 +2,977 @@ openapi: 3.0.3
 info:
   title: Asakusa API
   version: "1.0.0"
-
+  contact:
+    name: Daniel Ziaoure
+    email: daniel@akwabasystems.com
+  license:
+    url: https://mit-license.org/
+    name: MIT License
+    
+tags:
+  - name: Users
+    description: User accounts and users' items
+  - name: Teams
+    description: Project teams
+  - name: Projects
+    description: Projects
+  - name: Tasks
+    description: Project tasks
+  - name: Miscellaneous
+    description: Miscellaneous items
+    
 servers:
   - url: http://localhost:8085
 
-paths: {}
+paths: 
+  /users:
+    post:
+      tags:
+        - Users
+      summary: Create a user account
+      responses: 
+        '201':
+          description: Created
+          headers:
+            Location:
+              schema:
+                type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+              
+  /users/{id}:
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+    get:
+      tags:
+        - Users
+      summary: Retrieve a user's info
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+                
+    put:
+      tags:
+        - Users
+      summary: Update a user
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+                  
+    delete:
+      tags:
+        - Users
+      summary: Delete a user
+      responses:
+        '204':
+          description: No Content
 
+  /teams:
+    post:
+      tags:
+        - Teams
+      summary: Create a team
+      responses: 
+        '201':
+          description: Created
+          headers:
+            Location:
+              schema:
+                type: string
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+                
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Team'
+              
+    get:
+      tags:
+        - Teams
+      summary: Retrieve all teams
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Team'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+
+  /teams/{id}:
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+        
+    put:
+      tags:
+        - Teams
+      summary: Update a team
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Team'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+
+    delete:
+      tags:
+        - Teams
+      summary: Delete a team
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+                
+  /teams/{id}/members:
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+        
+    post:
+      tags:
+        - Teams
+      summary: Add a user to a team
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: Created
+          headers:
+            Location:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+                
+    get:
+      tags:
+        - Teams
+      summary: Retrieve all members of a team
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+                
+  /teams/{id}/members/{userId}:
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: userId
+        in: path
+        required: true
+        
+    delete:
+      tags:
+        - Teams
+      summary: Remove a user from a team
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        
+  /teams/{id}/projects:
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+        
+    get:
+      tags:
+        - Teams
+      summary: Retrieve all projects for a team
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Project'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              
+  /tasks:
+    post:
+      tags:
+        - Tasks
+      summary: Create a task
+      responses: 
+        '201':
+          description: Created
+          headers:
+            Location:
+              schema:
+                type: string
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+                
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+              
+  /tasks/{id}:
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+        
+    put:
+      tags:
+        - Tasks
+      summary: Update a task
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+
+    delete:
+      tags:
+        - Tasks
+      summary: Delete a task
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              
+  /tasks/{id}/media:
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+        
+    post:
+      tags:
+        - Tasks
+      summary: Add a medium to a task
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Media'
+      responses:
+        '201':
+          description: Created
+          headers:
+            Location:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+                
+    get:
+      tags:
+        - Tasks
+      summary: Retrieve the media for a task
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Media'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+              
+  
+  /tasks/{id}/media/{mediaId}:
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: mediaId
+        in: path
+        required: true
+        
+    delete:
+      tags:
+        - Tasks
+      summary: Remove a medium from a task
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+                
+  /projects:
+    post:
+      tags:
+        - Projects
+      summary: Create a project
+      responses: 
+        '201':
+          description: Created
+          headers:
+            Location:
+              schema:
+                type: string
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+                
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Project'
+              
+  /projects/{id}:
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+        
+    put:
+      tags:
+        - Projects
+      summary: Update a project
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Project'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+
+    delete:
+      tags:
+        - Projects
+      summary: Delete a project
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        
+  /projects/{id}/tasks:
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+        
+    get:
+      tags:
+        - Projects
+      summary: Retrieve the tasks for a project
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+                
+  /projects/{id}/media:
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+        
+    post:
+      tags:
+        - Projects
+      summary: Add a medium to a project
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Media'
+      responses:
+        '201':
+          description: Created
+          headers:
+            Location:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+                
+    get:
+      tags:
+        - Projects
+      summary: Retrieve the media for a project
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Media'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+                
+  /projects/{id}/media/{mediaId}:
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: mediaId
+        in: path
+        required: true
+        
+    delete:
+      tags:
+        - Projects
+      summary: Remove a medium from a project
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+                
+  /projects/{id}/discussions:
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+        
+    post:
+      tags:
+        - Projects
+      summary: Start a new discussion on a project
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Discussion'
+      responses:
+        '201':
+          description: Created
+          headers:
+            Location:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+                
+    get:
+      tags:
+        - Projects
+      summary: Retrieve the discussion thread for a project
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Discussion'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+                
+  /projects/{id}/discussions/{discussionId}:
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: discussionId
+        in: path
+        required: true
+        
+    delete:
+      tags:
+        - Projects
+      summary: Delete a discussion
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        
+  /projects/{id}/discussions/{discussionId}/messages:
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: discussionId
+        in: path
+        required: true
+        
+    post:
+      tags:
+        - Projects
+      summary: Post a message on a discussion
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Message'
+      responses:
+        '201':
+          description: Created
+          headers:
+            Location:
+              schema:
+                type: string
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+                
+    get:
+      tags:
+        - Projects
+      summary: Retrieve the messages for a discussion
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+                
+  /projects/{id}/discussions/{discussionId}/messages/{messageId}:
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: discussionId
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: messageId
+        in: path
+        required: true
+        
+    delete:
+      tags:
+        - Projects
+      summary: Delete a discussion message
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+                
+  /tags:
+
+    get:
+      tags:
+        - Miscellaneous
+      summary: Retrieve all the tags
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tag'
+                
 components:
   schemas:
     User:
       type: object
       properties:
-        id:
+        username:
           type: string
-          readOnly: true
+          minLength: 6
         password:
           type: string
           format: password
@@ -30,6 +987,13 @@ components:
           format: email
         picture:
           type: string
+        roles:
+          type: array
+          items:
+            type: string
+            enum:
+              - User
+              - Admin
       required:
         - email
         - first_name
@@ -43,10 +1007,8 @@ components:
           readOnly: true
         name:
           type: string
-        members:
-          type: array
-          items:
-            $ref: '#/components/schemas/User'
+        description:
+          type: string
       required:
         - name
         
@@ -83,7 +1045,7 @@ components:
             - in_progress
             - paused
             - blocked
-            - testing
+            - in_testing
             - done
         priority:
           type: string
@@ -106,6 +1068,8 @@ components:
         id: 
           type: string
           readOnly: true
+          pattern: '^[0-9a-fA-F\-]{36}$'
+          example: f7f680a8-d111-421f-b6b3-493ebf905078
         title:
           type: string
         description:
@@ -113,6 +1077,8 @@ components:
         project_id:
           type: string
         assignee_id:
+          type: string
+        depends_on:
           type: string
         start_date:
           type: string
@@ -130,7 +1096,7 @@ components:
             - todo
             - in_progress
             - blocked
-            - complete
+            - completed
         priority:
           type: string
           default: medium
@@ -152,10 +1118,15 @@ components:
         id:
           type: string
           readOnly: true
+          pattern: '^[0-9a-fA-F\-]{36}$'
+          example: f7f680a8-d111-421f-b6b3-493ebf905078
         author_id:
           type: string
         title:
           type: string
+        start_date:
+          type: string
+          format: date-time
       required:
         - author_id
         - title
@@ -166,12 +1137,18 @@ components:
         id:
           type: string
           readOnly: true
-        sender_id:
+          pattern: '^[0-9a-fA-F\-]{36}$'
+          example: f7f680a8-d111-421f-b6b3-493ebf905078
+        author_id:
           type: string
         body:
           type: string
+        created_date:
+          type: string
+          format: date-time
       required:
         - sender_id
+        - body
           
     Media:
       type: object
@@ -179,6 +1156,8 @@ components:
         id:
           type: string
           readOnly: true
+          pattern: '^[0-9a-fA-F\-]{36}$'
+          example: f7f680a8-d111-421f-b6b3-493ebf905078
         title:
           type: string
         thumbnail:
@@ -204,29 +1183,6 @@ components:
           type: string
         color_code:
           type: string
-  
-    OASError:
-      type: object
-      properties:
-        message:
-          type: string
-          description: Human-readable error message
-        errors:
-          type: array
-          items:
-            type: object
-            properties:
-              path:
-                type: string
-                description: |
-                  For input validation errors, identifies where in the JSON
-                  request body the error occurred
-              message:
-                type: string
-                description: Humna-readable error message
-              errorCode:
-                type: string
-                description: Code indicating error type
 
     Problem:
       type: object
@@ -246,4 +1202,5 @@ components:
         instance:
           type: string
           description: URI indicating error instance
+  
   
