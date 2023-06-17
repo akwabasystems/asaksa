@@ -1,9 +1,7 @@
 CREATE KEYSPACE asakusa WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 2};
 
-use asakusa;
 
-
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS asakusa.users (
     user_id text PRIMARY KEY,
     name text,
     given_name text,
@@ -27,14 +25,14 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 
-CREATE TABLE IF NOT EXISTS user_credentials (
+CREATE TABLE IF NOT EXISTS asakusa.user_credentials (
     user_id text PRIMARY KEY,
     password text,
     roles set<text>
 );
 
 
-CREATE TABLE IF NOT EXISTS user_preferences (
+CREATE TABLE IF NOT EXISTS asakusa.user_preferences (
     user_id text PRIMARY KEY,
     id uuid,
     settings text,
@@ -42,7 +40,7 @@ CREATE TABLE IF NOT EXISTS user_preferences (
 );
 
 
-CREATE TABLE IF NOT EXISTS teams (
+CREATE TABLE IF NOT EXISTS asakusa.teams (
     id uuid PRIMARY KEY,
     name text,
     description text,
@@ -51,13 +49,13 @@ CREATE TABLE IF NOT EXISTS teams (
 );
 
 
-CREATE TABLE IF NOT EXISTS team_members (
+CREATE TABLE IF NOT EXISTS asakusa.team_members (
     team_id uuid PRIMARY KEY,
     user_id text
 ) WITH COMMENT = 'Retrieve the members of a team';
 
 
-CREATE TABLE IF NOT EXISTS projects (
+CREATE TABLE IF NOT EXISTS asakusa.projects (
     id uuid PRIMARY KEY,
     name text,
     description text,
@@ -75,19 +73,19 @@ CREATE TABLE IF NOT EXISTS projects (
 );
 
 
-CREATE TABLE IF NOT EXISTS user_projects (
+CREATE TABLE IF NOT EXISTS asakusa.user_projects (
     user_id text PRIMARY KEY,
     project_id uuid
 ) WITH COMMENT = 'Retrieve the projects for a user';
 
 
-CREATE TABLE IF NOT EXISTS team_projects (
+CREATE TABLE IF NOT EXISTS asakusa.team_projects (
     team_id uuid PRIMARY KEY,
     project_id uuid
 ) WITH COMMENT = 'Retrieve the projects for a team';
 
 
-CREATE TABLE IF NOT EXISTS tasks (
+CREATE TABLE IF NOT EXISTS asakusa.tasks (
     project_id uuid,
     id uuid,
     title text,
@@ -106,14 +104,14 @@ CREATE TABLE IF NOT EXISTS tasks (
 );
 
 
-CREATE TABLE IF NOT EXISTS user_tasks (
+CREATE TABLE IF NOT EXISTS asakusa.user_tasks (
     assignee_id text PRIMARY KEY,
     project_id uuid,
     task_id uuid
 ) WITH COMMENT = 'Retrieve the tasks assigned to a user';
 
 
-CREATE TABLE IF NOT EXISTS project_discussions (
+CREATE TABLE IF NOT EXISTS asakusa.project_discussions (
     project_id uuid,
     id timeuuid,
     author_id text,
@@ -123,14 +121,14 @@ CREATE TABLE IF NOT EXISTS project_discussions (
 );
 
 
-CREATE TABLE IF NOT EXISTS user_discussions (
+CREATE TABLE IF NOT EXISTS asakusa.user_discussions (
     author_id text PRIMARY KEY,
     project_id uuid,
     discussion_id timeuuid
 ) WITH COMMENT = 'Retrieve the discussions for a user';
 
 
-CREATE TABLE IF NOT EXISTS discussion_messages (
+CREATE TABLE IF NOT EXISTS asakusa.discussion_messages (
     project_id uuid,
     discussion_id timeuuid,
     id timeuuid,
@@ -141,7 +139,7 @@ CREATE TABLE IF NOT EXISTS discussion_messages (
 ) WITH CLUSTERING ORDER BY ("id" ASC);
 
 
-CREATE TABLE IF NOT EXISTS media (
+CREATE TABLE IF NOT EXISTS asakusa.media (
     id uuid PRIMARY KEY,
     title text,
     thumbnail text,
@@ -152,26 +150,26 @@ CREATE TABLE IF NOT EXISTS media (
 );
 
 
-CREATE TABLE IF NOT EXISTS project_media (
+CREATE TABLE IF NOT EXISTS asakusa.project_media (
     project_id uuid PRIMARY KEY,
     media_id uuid
 ) WITH COMMENT = 'Retrieve the media for a project';
 
 
-CREATE TABLE IF NOT EXISTS tasks_media (
+CREATE TABLE IF NOT EXISTS asakusa.tasks_media (
     task_id uuid PRIMARY KEY,
     media_id uuid
 ) WITH COMMENT = 'Retrieve the media for a task';
 
 
-CREATE TABLE IF NOT EXISTS tags (
+CREATE TABLE IF NOT EXISTS asakusa.tags (
     id uuid PRIMARY KEY,
     name text,
     color_code text
 );
 
 
-CREATE TABLE IF NOT EXISTS project_activity (
+CREATE TABLE IF NOT EXISTS asakusa.project_activity (
     project_id uuid,
     id timeuuid,
     type text,
@@ -182,7 +180,7 @@ CREATE TABLE IF NOT EXISTS project_activity (
 ) WITH CLUSTERING ORDER BY ("id" DESC);
 
 
-CREATE TABLE IF NOT EXISTS phone_numbers (
+CREATE TABLE IF NOT EXISTS asakusa.phone_numbers (
     user_id text PRIMARY KEY,
     id timeuuid,
     country_id text,
@@ -195,7 +193,7 @@ CREATE TABLE IF NOT EXISTS phone_numbers (
     last_modified_date timestamp
 );
 
-CREATE TABLE IF NOT EXISTS phone_number_verifications (
+CREATE TABLE IF NOT EXISTS asakusa.phone_number_verifications (
     phone_number text PRIMARY KEY,
     id uuid,
     code text,
@@ -204,7 +202,7 @@ CREATE TABLE IF NOT EXISTS phone_number_verifications (
 );
 
 
-CREATE TABLE IF NOT EXISTS device_tokens (
+CREATE TABLE IF NOT EXISTS asakusa.device_tokens (
     user_id text PRIMARY KEY,
     id uuid,
     device_token text,
