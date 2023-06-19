@@ -37,12 +37,12 @@ public class User {
     private String phoneNumber;
     private boolean phoneNumberVerified;
     private Address address;
-    
+
     @CqlName("updated_at")
     private Instant lastModifiedDate;
-    
+
     public User() {}
-    
+
     public User(String userId, String givenName, String familyName, String email) {
         this.userId = userId;
         this.givenName = givenName;

@@ -3,6 +3,7 @@ package com.akwabasystems.asakusa.config;
 
 import com.datastax.oss.driver.api.core.CqlIdentifier;
 import com.datastax.oss.driver.api.core.CqlSession;
+import jakarta.annotation.PreDestroy;
 import java.net.InetSocketAddress;
 import javax.net.ssl.SSLContext;
 import org.slf4j.Logger;
@@ -26,37 +27,37 @@ public class CassandraConfiguration {
     private int cassandraPort;
 
     @Value("${cassandra.keyspace-name}")
-    private String keyspaceName;
+    private String keyspace;
 
     @Value("${cassandra.local-data-center}")
     private String localDataCenterName;
 
-    @Value("${aws.accessKey}")
+    @Value("${aws.access-key}")
     private String username;
 
-    @Value("${aws.secretKey}")
+    @Value("${aws.secret-key}")
     private String password;
     
     public CassandraConfiguration() {}
     
-    public CassandraConfiguration(String endpoint, 
+    public CassandraConfiguration(String cassandraHost, 
                                   int port, 
-                                  String dataCenter, 
-                                  String keyspaceName) {
+                                  String localDataCenterName, 
+                                  String keyspace) {
         super();
-        this.cassandraHost = endpoint;
+        this.cassandraHost = cassandraHost;
         this.cassandraPort = port;
-        this.localDataCenterName = dataCenter;
-        this.keyspaceName = keyspaceName;
+        this.localDataCenterName = localDataCenterName;
+        this.keyspace = keyspace;
     }
     
     @Bean
-    public CqlIdentifier keyspace() {
-        return CqlIdentifier.fromCql(getKeyspaceName());
+    public CqlIdentifier keyspaceName() {
+        return CqlIdentifier.fromCql(getKeyspace());
     }
     
     @Bean
-    public CqlSession session() {
+    public CqlSession cqlSession() {
         CqlSession session = null;
 
         try {
@@ -66,7 +67,7 @@ public class CassandraConfiguration {
                     .withSslContext(SSLContext.getDefault())
                     .withLocalDatacenter(getLocalDataCenterName())
                     .withAuthCredentials(getUsername(), getPassword())
-                    .withKeyspace(CqlIdentifier.fromCql(getKeyspaceName()))
+                    .withKeyspace(CqlIdentifier.fromCql(getKeyspace()))
                     .build();
 
             logger.info(String.format("[Cassandra] Session initialized - keyspace: %s, contact-point: %s%n",
@@ -83,8 +84,8 @@ public class CassandraConfiguration {
         return cassandraHost;
     }
 
-    public void setCassandraHost(String endpoint) {
-        this.cassandraHost = endpoint;
+    public void setCassandraHost(String cassandraHost) {
+        this.cassandraHost = cassandraHost;
     }
 
     public int getCassandraPort() {
@@ -95,20 +96,20 @@ public class CassandraConfiguration {
         this.cassandraPort = port;
     }
 
-    public String getKeyspaceName() {
-        return keyspaceName;
+    public String getKeyspace() {
+        return keyspace;
     }
 
-    public void setKeyspaceName(String keyspaceName) {
-        this.keyspaceName = keyspaceName;
+    public void setKeyspace(String keyspace) {
+        this.keyspace = keyspace;
     }
 
     public String getLocalDataCenterName() {
         return localDataCenterName;
     }
 
-    public void setLocalDataCenterName(String dataCenter) {
-        this.localDataCenterName = dataCenter;
+    public void setLocalDataCenterName(String localDataCenterName) {
+        this.localDataCenterName = localDataCenterName;
     }
 
     public String getUsername() {

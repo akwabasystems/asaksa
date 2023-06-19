@@ -156,7 +156,7 @@ CREATE TABLE IF NOT EXISTS asakusa.project_media (
 ) WITH COMMENT = 'Retrieve the media for a project';
 
 
-CREATE TABLE IF NOT EXISTS asakusa.tasks_media (
+CREATE TABLE IF NOT EXISTS asakusa.task_media (
     task_id uuid PRIMARY KEY,
     media_id uuid
 ) WITH COMMENT = 'Retrieve the media for a task';
@@ -189,7 +189,7 @@ CREATE TABLE IF NOT EXISTS asakusa.phone_numbers (
     formatted_number text,
     type text,
     status text,
-    create_date timestamp,
+    created_date timestamp,
     last_modified_date timestamp
 );
 
