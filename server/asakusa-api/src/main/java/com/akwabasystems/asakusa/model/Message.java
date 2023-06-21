@@ -93,7 +93,7 @@ public class Message {
 
     @Override
     public String toString() {
-        return String.format("Message { id: %s, authorId: %s, body: %s", 
+        return String.format("Message { id: %s, authorId: %s, body: %s }", 
                 getId(), getAuthorId(), getBody());
     }
     

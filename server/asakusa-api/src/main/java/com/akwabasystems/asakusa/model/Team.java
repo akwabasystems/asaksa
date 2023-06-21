@@ -25,15 +25,14 @@ public class Team {
     
     public Team() {}
     
-    public Team(UUID id, String name, String description) {
+    public Team(UUID id, String name) {
         this.id = id;
         this.name = name;
-        this.description = description;
     }
 
     @Override
     public String toString() {
-        return String.format("Team { id: %s, name: %s", getId(), getName());
+        return String.format("Team { id: %s, name: %s }", getId(), getName());
     }
 
     public UUID getId() {

@@ -24,8 +24,8 @@ public final class PhoneNumber {
     private String countryCode;
     private PhoneNumberType type = PhoneNumberType.MOBILE;
     private ItemStatus status = ItemStatus.UNVERIFIED;
-    private Instant createdDate;
-    private Instant lastModifiedDate;
+    private Instant createdDate = Instant.now();
+    private Instant lastModifiedDate = Instant.now();
     
     public PhoneNumber() { }
     

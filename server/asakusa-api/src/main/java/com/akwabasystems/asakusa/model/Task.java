@@ -40,7 +40,8 @@ public class Task {
             
     public Task() {}
     
-    public Task(UUID id, String title) {
+    public Task(UUID projectId, UUID id, String title) {
+        this.projectId = projectId;
         this.id = id;
         this.title = title;
     }
@@ -159,7 +160,7 @@ public class Task {
     
     @Override
     public String toString() {
-        return String.format("Task { id: %s, title: %s, projectId: %s", 
+        return String.format("Task { id: %s, title: %s, projectId: %s }", 
             getId(), getTitle(), getProjectId());
     }
     

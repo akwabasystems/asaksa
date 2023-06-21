@@ -77,7 +77,7 @@ public class Discussion {
 
     @Override
     public String toString() {
-        return String.format("Discussion { id: %s, title: %s, authorId: %s", 
+        return String.format("Discussion { id: %s, title: %s, authorId: %s }", 
                 getId(), getTitle(), getAuthorId());
     }
     
@@ -93,7 +93,7 @@ public class Discussion {
 
         Discussion discussion = (Discussion) object;
         return (discussion.getId() != null && discussion.getId().equals(getId())) &&
-               (discussion.getTitle() != null && discussion.getTitle().equals(getTitle())) &&
+               (discussion.getProjectId() != null && discussion.getProjectId().equals(getProjectId())) &&
                (discussion.getAuthorId()!= null && discussion.getAuthorId().equals(getAuthorId()));
     }
 
@@ -101,7 +101,7 @@ public class Discussion {
     public int hashCode() {
         int result = 17;
         result = 31 * result * ((getId() != null) ? getId().hashCode() : Integer.hashCode(1));
-        result = 31 * result * ((getTitle() != null) ? getTitle().hashCode() : Integer.hashCode(1));
+        result = 31 * result * ((getProjectId() != null) ? getProjectId().hashCode() : Integer.hashCode(1));
         result = 31 * result * ((getAuthorId() != null) ? getAuthorId().hashCode() : Integer.hashCode(1));
 
         return result;

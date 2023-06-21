@@ -156,7 +156,7 @@ public class Project {
 
     @Override
     public String toString() {
-        return String.format("Project { id: %s, name: %s, teamId: %s, ownerId: %s",
+        return String.format("Project { id: %s, name: %s, teamId: %s, ownerId: %s }",
                 getId(), getName(), getTeamId(), getOwnerId());
     }
     

@@ -30,7 +30,7 @@ public class User {
     private String website;
     private String email;
     private boolean emailVerified;
-    private Gender gender;
+    private Gender gender = Gender.FEMALE;
     private LocalDate birthDate;
     private String zoneInfo;
     private Locale locale;
@@ -212,7 +212,7 @@ public class User {
 
     @Override
     public String toString() {
-        return String.format("User { userId: %s, givenName: %s, familyName: %s, email: %s",
+        return String.format("User { userId: %s, givenName: %s, familyName: %s, email: %s }",
                 getUserId(), getGivenName(), getFamilyName(), getEmail());
     }
 

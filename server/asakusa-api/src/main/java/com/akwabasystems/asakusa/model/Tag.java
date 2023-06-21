@@ -55,7 +55,7 @@ public class Tag {
     
     @Override
     public String toString() {
-        return String.format("Tag { id: %s, name: %s, colorCode: %s", 
+        return String.format("Tag { id: %s, name: %s, colorCode: %s }", 
                 getId(), getName(), getColorCode());
     }
     

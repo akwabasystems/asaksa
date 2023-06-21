@@ -26,7 +26,7 @@ public class ProjectActivity {
     private String actor;
     private ActivityType type = ActivityType.NONE;
     private JSONObject details = new JSONObject();
-    private Instant createdDate;
+    private Instant createdDate = Instant.now();
 
     public ProjectActivity() {}
     

@@ -27,10 +27,11 @@ public class Media {
             
     public Media() {}
     
-    public Media(UUID id, MediaType type, String title) {
+    public Media(UUID id, MediaType type, String title, String url) {
         this.id = id;
         this.type = type;
         this.title = title;
+        this.url = url;
     }
 
     public UUID getId() {
@@ -91,8 +92,8 @@ public class Media {
     
     @Override
     public String toString() {
-        return String.format("Media { id: %s, type: %s, title: %s", 
-                getId(), getType(), getTitle());
+        return String.format("Media { id: %s, type: %s, title: %s, url: %s }", 
+                getId(), getType(), getTitle(), getUrl());
     }
     
     @Override
@@ -108,7 +109,7 @@ public class Media {
         Media media = (Media) object;
         return (media.getId() != null && media.getId().equals(getId())) &&
                (media.getType() != null && media.getType().equals(getType())) &&
-               (media.getTitle() != null && media.getTitle().equals(getTitle()));
+               (media.getUrl() != null && media.getUrl().equals(getUrl()));
     }
 
     @Override
@@ -116,7 +117,7 @@ public class Media {
         int result = 17;
         result = 31 * result * ((getId() != null) ? getId().hashCode() : Integer.hashCode(1));
         result = 31 * result * ((getType() != null) ? getType().hashCode() : Integer.hashCode(1));
-        result = 31 * result * ((getTitle() != null) ? getTitle().hashCode() : Integer.hashCode(1));
+        result = 31 * result * ((getUrl()!= null) ? getUrl().hashCode() : Integer.hashCode(1));
 
         return result;
     }

@@ -28,9 +28,10 @@ public class DeviceToken {
 
     public DeviceToken() {}
 
-    public DeviceToken(String userId, UUID id) {
+    public DeviceToken(String userId, UUID id, String token) {
         this.userId = userId;
         this.id = id;
+        this.token = token;
     }
 
     public String getUserId() {
@@ -75,7 +76,7 @@ public class DeviceToken {
 
     @Override
     public String toString() {
-        return String.format("DeviceToken { userId: %s, token: %s", 
+        return String.format("DeviceToken { userId: %s, token: %s }", 
                 getUserId(), getToken());
     }
     
