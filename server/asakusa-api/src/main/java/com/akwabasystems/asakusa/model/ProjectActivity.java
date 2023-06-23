@@ -7,7 +7,6 @@ import com.datastax.oss.driver.api.mapper.annotations.Entity;
 import com.datastax.oss.driver.api.mapper.annotations.NamingStrategy;
 import com.datastax.oss.driver.api.mapper.annotations.PartitionKey;
 import com.datastax.oss.driver.api.mapper.entity.naming.NamingConvention;
-import java.time.Instant;
 import java.util.UUID;
 import org.json.JSONObject;
 
@@ -26,7 +25,7 @@ public class ProjectActivity {
     private String actor;
     private ActivityType type = ActivityType.NONE;
     private JSONObject details = new JSONObject();
-    private Instant createdDate = Instant.now();
+    private String createdDate;
 
     public ProjectActivity() {}
     
@@ -80,11 +79,11 @@ public class ProjectActivity {
         this.details = details;
     }
 
-    public Instant getCreatedDate() {
+    public String getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Instant createdDate) {
+    public void setCreatedDate(String createdDate) {
         this.createdDate = createdDate;
     }
     

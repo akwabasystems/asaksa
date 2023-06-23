@@ -17,7 +17,7 @@ public class MediaTests extends BaseTestSuite {
         
         assertThat(media.getId()).isEqualTo(mediaId);
         assertThat(media.getType()).isEqualTo(MediaType.IMAGE);
-        assertThat(media.getCreatedDate()).isNotNull();
+        assertThat(media.getCreatedDate()).isNull();
         
     }
 

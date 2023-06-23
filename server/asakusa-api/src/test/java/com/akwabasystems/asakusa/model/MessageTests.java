@@ -26,7 +26,7 @@ public class MessageTests extends BaseTestSuite {
         assertThat(message.getDiscussionId()).isEqualTo(discussionId);
         assertThat(message.getAuthorId()).isEqualTo(authorId);
         assertThat(message.getBody()).isEqualTo(body);
-        assertThat(message.getCreatedDate()).isNotNull();
+        assertThat(message.getCreatedDate()).isNull();
     }
 
     @Test

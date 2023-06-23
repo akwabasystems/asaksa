@@ -18,8 +18,8 @@ public class DeviceTokenTests extends BaseTestSuite {
         assertThat(deviceToken.getUserId()).isEqualTo("jsmith");
         assertThat(deviceToken.getId()).isEqualTo(tokenId);
         assertThat(deviceToken.getToken()).isEqualTo(token);
-        assertThat(deviceToken.getCreatedDate()).isNotNull();
-        assertThat(deviceToken.getLastModifiedDate()).isNotNull();
+        assertThat(deviceToken.getCreatedDate()).isNull();
+        assertThat(deviceToken.getLastModifiedDate()).isNull();
         
     }
 

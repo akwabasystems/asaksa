@@ -15,8 +15,8 @@ public class TeamTests extends BaseTestSuite {
         
         assertThat(team.getId()).isNotNull();
         assertThat(team.getName()).isEqualTo("Team Akwaba 1");
-        assertThat(team.getCreatedDate()).isNotNull();
-        assertThat(team.getLastModifiedDate()).isNotNull();
+        assertThat(team.getCreatedDate()).isNull();
+        assertThat(team.getLastModifiedDate()).isNull();
     }
 
     @Test

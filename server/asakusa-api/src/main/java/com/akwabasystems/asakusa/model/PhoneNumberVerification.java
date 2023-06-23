@@ -5,7 +5,6 @@ import com.datastax.oss.driver.api.mapper.annotations.CqlName;
 import com.datastax.oss.driver.api.mapper.annotations.Entity;
 import com.datastax.oss.driver.api.mapper.annotations.NamingStrategy;
 import com.datastax.oss.driver.api.mapper.entity.naming.NamingConvention;
-import java.time.Instant;
 import java.util.UUID;
 
 
@@ -19,10 +18,10 @@ public class PhoneNumberVerification {
     private String code;
 
     @CqlName("created_at")
-    private Instant createdDate = Instant.now();
+    private String createdDate;
     
     @CqlName("expires_at")
-    private Instant expirationDate = Instant.now();
+    private String expirationDate;
 
 
     @Override
@@ -80,19 +79,19 @@ public class PhoneNumberVerification {
         this.code = code;
     }
 
-    public Instant getCreatedDate() {
+    public String getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Instant createdDate) {
+    public void setCreatedDate(String createdDate) {
         this.createdDate = createdDate;
     }
 
-    public Instant getExpirationDate() {
+    public String getExpirationDate() {
         return expirationDate;
     }
 
-    public void setExpirationDate(Instant expirationDate) {
+    public void setExpirationDate(String expirationDate) {
         this.expirationDate = expirationDate;
     }
 

@@ -22,7 +22,7 @@ public class ProjectActivityTests extends BaseTestSuite {
         assertThat(activity.getActor()).isEqualTo("jsmith");
         assertThat(activity.getType()).isEqualTo(ActivityType.DISCUSSION);
         assertThat(activity.getDetails()).isNotNull();
-        assertThat(activity.getCreatedDate()).isNotNull();
+        assertThat(activity.getCreatedDate()).isNull();
     }
 
     @Test

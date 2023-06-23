@@ -7,7 +7,6 @@ import com.datastax.oss.driver.api.mapper.annotations.Entity;
 import com.datastax.oss.driver.api.mapper.annotations.NamingStrategy;
 import com.datastax.oss.driver.api.mapper.annotations.PartitionKey;
 import com.datastax.oss.driver.api.mapper.entity.naming.NamingConvention;
-import java.time.Instant;
 import java.util.UUID;
 
 
@@ -27,7 +26,7 @@ public class Message {
     
     private String body;
     private String authorId;
-    private Instant createdDate = Instant.now();
+    private String createdDate;
             
     public Message() {}
     
@@ -83,11 +82,11 @@ public class Message {
         this.authorId = authorId;
     }
 
-    public Instant getCreatedDate() {
+    public String getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Instant createdDate) {
+    public void setCreatedDate(String createdDate) {
         this.createdDate = createdDate;
     }
 
