@@ -6,6 +6,7 @@ import com.akwabasystems.asakusa.dao.impl.DeleteUserQueryProvider;
 import com.akwabasystems.asakusa.model.Role;
 import com.akwabasystems.asakusa.model.User;
 import com.akwabasystems.asakusa.model.UserCredentials;
+import com.akwabasystems.asakusa.model.UserPreferences;
 import com.datastax.oss.driver.api.core.PagingIterable;
 import com.datastax.oss.driver.api.mapper.annotations.CqlName;
 import com.datastax.oss.driver.api.mapper.annotations.Dao;
@@ -68,16 +69,6 @@ public interface UserDao {
     
     
     /**
-     * Returns the credentials of the user with the specified ID
-     * 
-     * @param userId    the ID of the user whose credentials to return
-     * @return the credentials of the user with the specified ID
-     */
-    @Select
-    UserCredentials getCredentials(String userId);
-    
-    
-    /**
      * Updates the specified user account
      * 
      * @param user      the user account to update
@@ -86,6 +77,29 @@ public interface UserDao {
     @Update
     @StatementAttributes(consistencyLevel = "LOCAL_QUORUM")
     void update(User user) throws Exception;
+    
+    
+    /**
+     * Deletes the specified user
+     * 
+     * @param user      the user to delete
+     * @return true if the user is deleted successfully; otherwise, returns false
+     */
+    @QueryProvider(
+        providerClass = DeleteUserQueryProvider.class,
+        entityHelpers = { User.class, UserCredentials.class }
+    )
+    boolean delete(User user) throws Exception;
+    
+    
+    /**
+     * Returns the credentials of the user with the specified ID
+     * 
+     * @param userId    the ID of the user whose credentials to return
+     * @return the credentials of the user with the specified ID
+     */
+    @Select
+    UserCredentials getCredentials(String userId);
     
     
     /**
@@ -100,15 +114,22 @@ public interface UserDao {
     
     
     /**
-     * Deletes the specified user
+     * Returns the preferences for the user with the specified ID
      * 
-     * @param user      the user to delete
-     * @return true if the user is deleted successfully; otherwise, returns false
+     * @param userId    the ID of the user whose preferences to return
+     * @return the preferences of the user with the specified ID
      */
-    @QueryProvider(
-        providerClass = DeleteUserQueryProvider.class,
-        entityHelpers = { User.class, UserCredentials.class }
-    )
-    boolean delete(User user) throws Exception;
+    @Select
+    UserPreferences getPreferences(String userId);
+    
+    
+    /**
+     * Saves the given preferences
+     * 
+     * @param preferences       the credentials to save
+     */
+    @Update
+    @StatementAttributes(consistencyLevel = "LOCAL_QUORUM")
+    void savePreferences(UserPreferences preferences);
     
 }

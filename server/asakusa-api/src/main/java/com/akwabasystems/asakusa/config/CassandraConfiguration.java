@@ -2,6 +2,7 @@
 package com.akwabasystems.asakusa.config;
 
 import com.akwabasystems.asakusa.dao.helper.AddressToMapCodec;
+import com.akwabasystems.asakusa.dao.helper.JSONObjectToTextCodec;
 import com.akwabasystems.asakusa.model.Address;
 import com.akwabasystems.asakusa.model.Gender;
 import com.akwabasystems.asakusa.model.Role;
@@ -14,6 +15,7 @@ import com.datastax.oss.driver.api.core.type.reflect.GenericType;
 import java.net.InetSocketAddress;
 import java.util.List;
 import javax.net.ssl.SSLContext;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -83,6 +85,13 @@ public class CassandraConfiguration {
              */
             TypeCodec<Address> addressCodec = new AddressToMapCodec();
             
+            /**
+             * Register the JSONObjectToText codec to encode and decode JSONObject 
+             * fields to their corresponding <code>text</code> representations 
+             * in the Cassandra schema.
+             */
+            TypeCodec<JSONObject> jsonCodec = new JSONObjectToTextCodec();
+            
             /** 
              * Register the Role codec to encode and decode the "roles" field 
              * of the UserCredentials class
@@ -95,7 +104,12 @@ public class CassandraConfiguration {
                     .withLocalDatacenter(getLocalDataCenterName())
                     .withAuthCredentials(getUsername(), getPassword())
                     .withKeyspace(CqlIdentifier.fromCql(getKeyspace()))
-                    .addTypeCodecs(genderCodec, addressCodec, roleCodec)
+                    .addTypeCodecs(
+                        genderCodec, 
+                        addressCodec, 
+                        jsonCodec, 
+                        roleCodec
+                    )
                     .build();
 
             logger.info(String.format("[Cassandra] Session initialized - keyspace: %s, contact-point: %s%n",

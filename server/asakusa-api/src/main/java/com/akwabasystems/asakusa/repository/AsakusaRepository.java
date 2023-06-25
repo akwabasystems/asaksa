@@ -114,7 +114,6 @@ public class AsakusaRepository {
         /**
          * CREATE TABLE IF NOT EXISTS user_preferences (
          *   user_id text PRIMARY KEY,
-         *   id uuid,
          *   settings text,
          *   last_modified_date text
          * );
@@ -123,7 +122,6 @@ public class AsakusaRepository {
             createTable(keyspaceName, SchemaNames.TABLE_USER_PREFERENCES)
                     .ifNotExists()
                     .withPartitionKey(SchemaNames.COLUMN_USER_ID, DataTypes.TEXT)
-                    .withColumn(SchemaNames.COLUMN_ID, DataTypes.UUID)
                     .withColumn(SchemaNames.COLUMN_SETTINGS, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_LAST_MODIFIED_DATE, DataTypes.TEXT)
                     .build());

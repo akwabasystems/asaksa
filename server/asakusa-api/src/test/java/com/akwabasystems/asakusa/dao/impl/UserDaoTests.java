@@ -8,6 +8,7 @@ import com.akwabasystems.asakusa.model.Gender;
 import com.akwabasystems.asakusa.model.Role;
 import com.akwabasystems.asakusa.model.User;
 import com.akwabasystems.asakusa.model.UserCredentials;
+import com.akwabasystems.asakusa.model.UserPreferences;
 import com.akwabasystems.asakusa.repository.AsakusaRepository;
 import com.akwabasystems.asakusa.repository.RepositoryMapper;
 import com.akwabasystems.asakusa.utils.PasswordUtils;
@@ -17,11 +18,14 @@ import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.PagingIterable;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -307,5 +311,40 @@ public class UserDaoTests extends BaseTestSuite {
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("error.invalidUserId");
         
+    }
+    
+    @Test
+    public void testSaveUserPreferences() throws Exception {
+        UserDao userDao = mapper.userDao();
+        
+        User user = TestUtils.defaultUser();
+        userDao.create(user, "jsmith01".toCharArray(), new HashSet<>());
+
+        Map<String,Object> settings = new HashMap<>();
+        settings.put("preferredLanguage", "en");
+        settings.put("timezone", "America/Los_Angeles");
+
+        UserPreferences preferences = new UserPreferences(user.getUserId(), 
+                new JSONObject(settings));
+
+        userDao.savePreferences(preferences);
+        
+        UserPreferences userPreferences = userDao.getPreferences(user.getUserId());
+        assertThat(userPreferences).isNotNull();
+        
+        JSONObject currentSettings = userPreferences.getSettings();
+        assertThat(currentSettings.getString("preferredLanguage")).isEqualTo("en");
+
+        currentSettings.put("timezone", "Asia/Tokyo");
+        currentSettings.put("enableNotifications", true);
+        userDao.savePreferences(userPreferences);
+        
+        userPreferences = userDao.getPreferences(user.getUserId());
+        
+        assertThat(userPreferences.getSettings().getString("timezone")).isEqualTo("Asia/Tokyo");
+        assertThat(userPreferences.getSettings().getBoolean("enableNotifications")).isTrue();
+
+        boolean userDeleted = userDao.delete(user);
+        assertThat(userDeleted).isTrue();
     }
 }

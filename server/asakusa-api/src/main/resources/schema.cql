@@ -34,7 +34,6 @@ CREATE TABLE IF NOT EXISTS asakusa.user_credentials (
 
 CREATE TABLE IF NOT EXISTS asakusa.user_preferences (
     user_id text PRIMARY KEY,
-    id uuid,
     settings text,
     last_modified_date text
 );
