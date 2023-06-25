@@ -1,6 +1,7 @@
 
 package com.akwabasystems.asakusa.utils;
 
+import com.akwabasystems.asakusa.model.Team;
 import com.akwabasystems.asakusa.model.User;
 import java.util.Locale;
 import java.util.UUID;
@@ -32,4 +33,14 @@ public class TestUtils {
         
         return user;
     }
+    
+    public static Team defaultTeam() {
+        String teamName = String.format("Team %s", randomSuffix());
+        
+        Team team = new Team(UUID.randomUUID(), teamName);
+        team.setDescription(teamName);
+        
+        return team;
+    }
+    
 }

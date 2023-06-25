@@ -9,4 +9,6 @@ public class DAOException {
     public static final String USER_ALREADY_EXISTS = "error.userAlreadyExists";
     public static final String EMAIL_ALREADY_EXISTS = "error.emailAlreadyExists";
     
+    public static final String TEAM_ALREADY_EXISTS = "error.teamAlreadyExists";
+    
 }
