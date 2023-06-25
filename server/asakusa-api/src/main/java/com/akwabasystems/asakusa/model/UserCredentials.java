@@ -19,7 +19,7 @@ public class UserCredentials {
     private String userId;
     
     private String password;
-    private Set<String> roles = new HashSet<>();
+    private Set<Role> roles = new HashSet<>();
             
     public UserCredentials() {}
     
@@ -44,11 +44,11 @@ public class UserCredentials {
         this.password = password;
     }
 
-    public Set<String> getRoles() {
+    public Set<Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(Set<String> roles) {
+    public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
     
@@ -81,7 +81,5 @@ public class UserCredentials {
 
         return result;
     }
-
-    
 
 }

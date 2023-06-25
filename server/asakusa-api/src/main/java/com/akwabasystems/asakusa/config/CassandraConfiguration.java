@@ -1,10 +1,18 @@
 
 package com.akwabasystems.asakusa.config;
 
+import com.akwabasystems.asakusa.dao.helper.AddressToMapCodec;
+import com.akwabasystems.asakusa.model.Address;
+import com.akwabasystems.asakusa.model.Gender;
+import com.akwabasystems.asakusa.model.Role;
 import com.datastax.oss.driver.api.core.CqlIdentifier;
 import com.datastax.oss.driver.api.core.CqlSession;
-import jakarta.annotation.PreDestroy;
+import com.datastax.oss.driver.api.core.type.codec.ExtraTypeCodecs;
+import com.datastax.oss.driver.api.core.type.codec.TypeCodec;
+import com.datastax.oss.driver.api.core.type.codec.TypeCodecs;
+import com.datastax.oss.driver.api.core.type.reflect.GenericType;
 import java.net.InetSocketAddress;
+import java.util.List;
 import javax.net.ssl.SSLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,12 +70,32 @@ public class CassandraConfiguration {
 
         try {
 
+            /** 
+             * Register the Gender codec to encode and decode the "gender" field 
+             * of the User class
+             */
+            TypeCodec<Gender> genderCodec = ExtraTypeCodecs.enumNamesOf(Gender.class);
+            
+            /**
+             * Register the MapToAddress codec to encode and decode the Address field
+             * of the User class, which is then converted to a <code>map<text,text></code>
+             * in the Cassandra schema.
+             */
+            TypeCodec<Address> addressCodec = new AddressToMapCodec();
+            
+            /** 
+             * Register the Role codec to encode and decode the "roles" field 
+             * of the UserCredentials class
+             */
+            TypeCodec<Role> roleCodec = ExtraTypeCodecs.enumNamesOf(Role.class);
+            
             session = CqlSession.builder()
                     .addContactPoint(new InetSocketAddress(getCassandraHost(), getCassandraPort()))
                     .withSslContext(SSLContext.getDefault())
                     .withLocalDatacenter(getLocalDataCenterName())
                     .withAuthCredentials(getUsername(), getPassword())
                     .withKeyspace(CqlIdentifier.fromCql(getKeyspace()))
+                    .addTypeCodecs(genderCodec, addressCodec, roleCodec)
                     .build();
 
             logger.info(String.format("[Cassandra] Session initialized - keyspace: %s, contact-point: %s%n",

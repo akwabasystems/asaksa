@@ -6,7 +6,7 @@ import com.datastax.oss.driver.api.mapper.annotations.Entity;
 import com.datastax.oss.driver.api.mapper.annotations.NamingStrategy;
 import com.datastax.oss.driver.api.mapper.annotations.PartitionKey;
 import com.datastax.oss.driver.api.mapper.entity.naming.NamingConvention;
-import java.util.Locale;
+
 
 
 @Entity
@@ -31,7 +31,7 @@ public class User {
     private Gender gender = Gender.FEMALE;
     private String birthDate;
     private String zoneInfo;
-    private Locale locale;
+    private String locale;
     private String phoneNumber;
     private boolean phoneNumberVerified;
     private Address address;
@@ -168,11 +168,11 @@ public class User {
         this.zoneInfo = zoneInfo;
     }
 
-    public Locale getLocale() {
+    public String getLocale() {
         return locale;
     }
 
-    public void setLocale(Locale locale) {
+    public void setLocale(String locale) {
         this.locale = locale;
     }
 
