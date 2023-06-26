@@ -1,6 +1,7 @@
 
 package com.akwabasystems.asakusa.model;
 
+import com.datastax.oss.driver.api.mapper.annotations.ClusteringColumn;
 import com.datastax.oss.driver.api.mapper.annotations.CqlName;
 import com.datastax.oss.driver.api.mapper.annotations.Entity;
 import com.datastax.oss.driver.api.mapper.annotations.NamingStrategy;
@@ -17,11 +18,13 @@ import java.util.UUID;
 public class Project {
 
     @PartitionKey
+    private UUID teamId;
+    
+    @ClusteringColumn
     private UUID id;
     
     private String name;
     private String description;
-    private UUID teamId;
     private String ownerId;
     private String startDate;
     private String endDate;
@@ -35,7 +38,8 @@ public class Project {
             
     public Project() {}
     
-    public Project(UUID id, String name) {
+    public Project(UUID teamId, UUID id, String name) {
+        this.teamId = teamId;
         this.id = id;
         this.name = name;
     }

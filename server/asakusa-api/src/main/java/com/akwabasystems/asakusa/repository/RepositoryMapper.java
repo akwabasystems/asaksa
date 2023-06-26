@@ -1,6 +1,7 @@
 
 package com.akwabasystems.asakusa.repository;
 
+import com.akwabasystems.asakusa.dao.ProjectDao;
 import com.akwabasystems.asakusa.dao.TeamDao;
 import com.akwabasystems.asakusa.dao.UserDao;
 import com.datastax.oss.driver.api.core.CqlSession;
@@ -21,6 +22,9 @@ public interface RepositoryMapper {
     
     @DaoFactory
     TeamDao teamDao();
+    
+    @DaoFactory
+    ProjectDao projectDao();
     
     static MapperBuilder<RepositoryMapper> builder(CqlSession cqlSession) {
         return new RepositoryMapperBuilder(cqlSession);

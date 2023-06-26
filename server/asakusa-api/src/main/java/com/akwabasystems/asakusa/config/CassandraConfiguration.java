@@ -5,15 +5,14 @@ import com.akwabasystems.asakusa.dao.helper.AddressToMapCodec;
 import com.akwabasystems.asakusa.dao.helper.JSONObjectToTextCodec;
 import com.akwabasystems.asakusa.model.Address;
 import com.akwabasystems.asakusa.model.Gender;
+import com.akwabasystems.asakusa.model.ItemPriority;
+import com.akwabasystems.asakusa.model.ItemStatus;
 import com.akwabasystems.asakusa.model.Role;
 import com.datastax.oss.driver.api.core.CqlIdentifier;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.type.codec.ExtraTypeCodecs;
 import com.datastax.oss.driver.api.core.type.codec.TypeCodec;
-import com.datastax.oss.driver.api.core.type.codec.TypeCodecs;
-import com.datastax.oss.driver.api.core.type.reflect.GenericType;
 import java.net.InetSocketAddress;
-import java.util.List;
 import javax.net.ssl.SSLContext;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -70,34 +69,41 @@ public class CassandraConfiguration {
     public CqlSession cqlSession() {
         CqlSession session = null;
 
+        /** 
+         * Register the Gender codec to encode and decode the "gender" field 
+         * of the User class
+         */
+        TypeCodec<Gender> genderCodec = ExtraTypeCodecs.enumNamesOf(Gender.class);
+
+        /**
+         * Register the MapToAddress codec to encode and decode the Address field
+         * of the User class, which is then converted to a <code>map<text,text></code>
+         * in the Cassandra schema.
+         */
+        TypeCodec<Address> addressCodec = new AddressToMapCodec();
+
+        /**
+         * Register the JSONObjectToText codec to encode and decode JSONObject 
+         * fields to their corresponding <code>text</code> representations 
+         * in the Cassandra schema.
+         */
+        TypeCodec<JSONObject> jsonCodec = new JSONObjectToTextCodec();
+
+        /** 
+         * Register the Role codec to encode and decode the "roles" field 
+         * of the UserCredentials class
+         */
+        TypeCodec<Role> roleCodec = ExtraTypeCodecs.enumNamesOf(Role.class);
+
+       /** 
+        * Register the codecs to encode and decode the "ItemStatus" 
+        * and "ItemPriority" enums
+        */
+        TypeCodec<ItemStatus> statusCodec = ExtraTypeCodecs.enumNamesOf(ItemStatus.class);
+        TypeCodec<ItemPriority> priorityCodec = ExtraTypeCodecs.enumNamesOf(ItemPriority.class);
+            
         try {
 
-            /** 
-             * Register the Gender codec to encode and decode the "gender" field 
-             * of the User class
-             */
-            TypeCodec<Gender> genderCodec = ExtraTypeCodecs.enumNamesOf(Gender.class);
-            
-            /**
-             * Register the MapToAddress codec to encode and decode the Address field
-             * of the User class, which is then converted to a <code>map<text,text></code>
-             * in the Cassandra schema.
-             */
-            TypeCodec<Address> addressCodec = new AddressToMapCodec();
-            
-            /**
-             * Register the JSONObjectToText codec to encode and decode JSONObject 
-             * fields to their corresponding <code>text</code> representations 
-             * in the Cassandra schema.
-             */
-            TypeCodec<JSONObject> jsonCodec = new JSONObjectToTextCodec();
-            
-            /** 
-             * Register the Role codec to encode and decode the "roles" field 
-             * of the UserCredentials class
-             */
-            TypeCodec<Role> roleCodec = ExtraTypeCodecs.enumNamesOf(Role.class);
-            
             session = CqlSession.builder()
                     .addContactPoint(new InetSocketAddress(getCassandraHost(), getCassandraPort()))
                     .withSslContext(SSLContext.getDefault())
@@ -108,7 +114,9 @@ public class CassandraConfiguration {
                         genderCodec, 
                         addressCodec, 
                         jsonCodec, 
-                        roleCodec
+                        roleCodec,
+                        statusCodec,
+                        priorityCodec
                     )
                     .build();
 

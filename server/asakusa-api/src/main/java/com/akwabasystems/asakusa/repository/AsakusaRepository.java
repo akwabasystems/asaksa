@@ -165,34 +165,35 @@ public class AsakusaRepository {
         
         /**
          * CREATE TABLE IF NOT EXISTS projects (
-         *   id uuid PRIMARY KEY,
+         *   team_id uuid,
+         *   id uuid,
          *   name text,
          *   description text,
-         *   team_id uuid,
          *   owner_id text,
          *   start_date text,
          *   deadline text,
          *   end_date text,
-         *   capacity smallint,
+         *   capacity int,
          *   status text,
          *   priority text,
          *   tags set<text>,
          *   created_date text,
-         *   last_modified_date text
+         *   last_modified_date text,
+         *   PRIMARY KEY (("team_id"), "id")
          * );
          */
         cqlSession.execute(
             createTable(keyspaceName, SchemaNames.TABLE_PROJECTS)
                     .ifNotExists()
-                    .withPartitionKey(SchemaNames.COLUMN_ID, DataTypes.UUID)
+                    .withPartitionKey(SchemaNames.COLUMN_TEAM_ID, DataTypes.UUID)
+                    .withClusteringColumn(SchemaNames.COLUMN_ID, DataTypes.UUID)
                     .withColumn(SchemaNames.COLUMN_NAME, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_DESCRIPTION, DataTypes.TEXT)
-                    .withColumn(SchemaNames.COLUMN_TEAM_ID, DataTypes.UUID)
                     .withColumn(SchemaNames.COLUMN_OWNER_ID, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_START_DATE, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_DEADLINE, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_END_DATE, DataTypes.TEXT)
-                    .withColumn(SchemaNames.COLUMN_CAPACITY, DataTypes.SMALLINT)
+                    .withColumn(SchemaNames.COLUMN_CAPACITY, DataTypes.INT)
                     .withColumn(SchemaNames.COLUMN_STATUS, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_PRIORITY, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_TAGS, DataTypes.setOf(DataTypes.TEXT))
@@ -200,36 +201,6 @@ public class AsakusaRepository {
                     .withColumn(SchemaNames.COLUMN_LAST_MODIFIED_DATE, DataTypes.TEXT)
                     .build());
         logger.info(String.format("Table '%s' has been created (if needed)", SchemaNames.TABLE_PROJECTS.asInternal()));
-        
-        /**
-         * CREATE TABLE IF NOT EXISTS user_projects (
-         *   user_id text PRIMARY KEY,
-         *   project_id uuid
-         * ) WITH COMMENT = 'Retrieve the projects for a user';
-         */
-        cqlSession.execute(
-            createTable(keyspaceName, SchemaNames.TABLE_USER_PROJECTS)
-                    .ifNotExists()
-                    .withPartitionKey(SchemaNames.COLUMN_USER_ID, DataTypes.TEXT)
-                    .withColumn(SchemaNames.COLUMN_PROJECT_ID, DataTypes.UUID)
-                    .withComment("Retrieve the projects for a user")
-                    .build());
-        logger.info(String.format("Table '%s' has been created (if needed)", SchemaNames.TABLE_USER_PROJECTS.asInternal()));
-        
-        /**
-         * CREATE TABLE IF NOT EXISTS team_projects (
-         *   team_id uuid PRIMARY KEY,
-         *   project_id uuid
-         * ) WITH COMMENT = 'Retrieve the projects for a team';
-         */
-        cqlSession.execute(
-            createTable(keyspaceName, SchemaNames.TABLE_TEAM_PROJECTS)
-                    .ifNotExists()
-                    .withPartitionKey(SchemaNames.COLUMN_TEAM_ID, DataTypes.UUID)
-                    .withColumn(SchemaNames.COLUMN_PROJECT_ID, DataTypes.UUID)
-                    .withComment("Retrieve the projects for a team")
-                    .build());
-        logger.info(String.format("Table '%s' has been created (if needed)", SchemaNames.TABLE_TEAM_PROJECTS.asInternal()));
         
         /**
          * CREATE TABLE IF NOT EXISTS tasks (
@@ -240,7 +211,7 @@ public class AsakusaRepository {
          *   assignee_id text,
          *   depends_on uuid,
          *   start_date text,
-         *   estimated_duration smallint,
+         *   estimated_duration int,
          *   end_date text,
          *   status text,
          *   priority text,
@@ -260,7 +231,7 @@ public class AsakusaRepository {
                     .withColumn(SchemaNames.COLUMN_ASSIGNEE_ID, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_DEPENDS_ON, DataTypes.UUID)
                     .withColumn(SchemaNames.COLUMN_START_DATE, DataTypes.TEXT)
-                    .withColumn(SchemaNames.COLUMN_ESTIMATED_DURATION, DataTypes.SMALLINT)
+                    .withColumn(SchemaNames.COLUMN_ESTIMATED_DURATION, DataTypes.INT)
                     .withColumn(SchemaNames.COLUMN_END_DATE, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_STATUS, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_PRIORITY, DataTypes.TEXT)

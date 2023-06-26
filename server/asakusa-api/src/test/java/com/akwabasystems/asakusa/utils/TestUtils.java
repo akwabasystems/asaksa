@@ -16,7 +16,7 @@ public class TestUtils {
     
     
     public static int randomSuffix() {
-        return (int) Math.floor(Math.random() * 1000000);
+        return (int) Math.floor(Math.random() * 100000);
     }
     
     public static User defaultUser() {

@@ -56,33 +56,22 @@ CREATE TABLE IF NOT EXISTS asakusa.team_members (
 
 
 CREATE TABLE IF NOT EXISTS asakusa.projects (
-    id uuid PRIMARY KEY,
+    team_id uuid,
+    id uuid,
     name text,
     description text,
-    team_id uuid,
     owner_id text,
     start_date text,
     deadline text,
     end_date text,
-    capacity smallint,
+    capacity int,
     status text,
     priority text,
     tags set<text>,
     created_date text,
-    last_modified_date text
+    last_modified_date text,
+    PRIMARY KEY (("team_id"), "id")
 );
-
-
-CREATE TABLE IF NOT EXISTS asakusa.user_projects (
-    user_id text PRIMARY KEY,
-    project_id uuid
-) WITH COMMENT = 'Retrieve the projects for a user';
-
-
-CREATE TABLE IF NOT EXISTS asakusa.team_projects (
-    team_id uuid PRIMARY KEY,
-    project_id uuid
-) WITH COMMENT = 'Retrieve the projects for a team';
 
 
 CREATE TABLE IF NOT EXISTS asakusa.tasks (
@@ -93,7 +82,7 @@ CREATE TABLE IF NOT EXISTS asakusa.tasks (
     assignee_id text,
     depends_on uuid,
     start_date text,
-    estimated_duration smallint,
+    estimated_duration int,
     end_date text,
     status text,
     priority text,
