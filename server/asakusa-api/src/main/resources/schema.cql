@@ -94,9 +94,10 @@ CREATE TABLE IF NOT EXISTS asakusa.tasks (
 
 
 CREATE TABLE IF NOT EXISTS asakusa.user_tasks (
-    assignee_id text PRIMARY KEY,
+    assignee_id text,
     project_id uuid,
-    task_id uuid
+    task_id uuid,
+    PRIMARY KEY(("assignee_id", "project_id"), "task_id")
 ) WITH COMMENT = 'Retrieve the tasks assigned to a user';
 
 

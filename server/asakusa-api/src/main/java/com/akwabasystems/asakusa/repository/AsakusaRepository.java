@@ -240,24 +240,25 @@ public class AsakusaRepository {
                     .withColumn(SchemaNames.COLUMN_LAST_MODIFIED_DATE, DataTypes.TEXT)
                     .build());
         logger.info(String.format("Table '%s' has been created (if needed)", SchemaNames.TABLE_TASKS.asInternal()));
-        
+
         /**
          * CREATE TABLE IF NOT EXISTS user_tasks (
-         *   assignee_id text PRIMARY KEY,
+         *   assignee_id text,
          *   project_id uuid,
-         *   task_id uuid
+         *   task_id uuid,
+         *   PRIMARY KEY(("assignee_id", "project_id"), "task_id")
          * ) WITH COMMENT = 'Retrieve the tasks assigned to a user';
          */
         cqlSession.execute(
             createTable(keyspaceName, SchemaNames.TABLE_USER_TASKS)
                     .ifNotExists()
                     .withPartitionKey(SchemaNames.COLUMN_ASSIGNEE_ID, DataTypes.TEXT)
-                    .withColumn(SchemaNames.COLUMN_PROJECT_ID, DataTypes.UUID)
-                    .withColumn(SchemaNames.COLUMN_TASK_ID, DataTypes.UUID)
+                    .withPartitionKey(SchemaNames.COLUMN_PROJECT_ID, DataTypes.UUID)
+                    .withClusteringColumn(SchemaNames.COLUMN_TASK_ID, DataTypes.UUID)
                     .withComment("Retrieve the tasks assigned to a user")
                     .build());
         logger.info(String.format("Table '%s' has been created (if needed)", SchemaNames.TABLE_USER_TASKS.asInternal()));
-        
+
         /**
          * CREATE TABLE IF NOT EXISTS project_discussions (
          *   project_id uuid,

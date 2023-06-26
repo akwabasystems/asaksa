@@ -1,6 +1,7 @@
 
 package com.akwabasystems.asakusa.utils;
 
+import com.akwabasystems.asakusa.model.Project;
 import com.akwabasystems.asakusa.model.Team;
 import com.akwabasystems.asakusa.model.User;
 import java.util.Locale;
@@ -41,6 +42,11 @@ public class TestUtils {
         team.setDescription(teamName);
         
         return team;
+    }
+    
+    public static Project defaultProject() {
+        return new Project(UUID.randomUUID(), UUID.randomUUID(), 
+                "Project " + TestUtils.randomSuffix());
     }
     
 }

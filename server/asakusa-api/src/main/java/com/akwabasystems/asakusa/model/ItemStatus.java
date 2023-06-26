@@ -18,6 +18,8 @@ public enum ItemStatus {
     
     DONE,
     
+    COMPLETED,
+    
     VERIFIED,
     
     UNVERIFIED;

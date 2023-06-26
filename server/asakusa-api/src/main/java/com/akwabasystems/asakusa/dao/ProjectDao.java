@@ -39,8 +39,9 @@ public interface ProjectDao {
     /**
      * Finds a project by ID
      * 
-     * @param id    the ID of the team to find
-     * @return the team with the specified ID
+     * @param teamId    the ID of the team for the project
+     * @param id        the ID of the project to find
+     * @return the project with the specified ID
      */
     @Select
     Project findById(UUID teamId, UUID id);
