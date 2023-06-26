@@ -3,11 +3,12 @@ package com.akwabasystems.asakusa.dao;
 
 import com.akwabasystems.asakusa.dao.impl.CreateTeamQueryProvider;
 import com.akwabasystems.asakusa.model.Team;
-import com.akwabasystems.asakusa.model.User;
 import com.datastax.oss.driver.api.core.PagingIterable;
+import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.mapper.annotations.CqlName;
 import com.datastax.oss.driver.api.mapper.annotations.Dao;
 import com.datastax.oss.driver.api.mapper.annotations.Delete;
+import com.datastax.oss.driver.api.mapper.annotations.Query;
 import com.datastax.oss.driver.api.mapper.annotations.QueryProvider;
 import com.datastax.oss.driver.api.mapper.annotations.Select;
 import com.datastax.oss.driver.api.mapper.annotations.StatementAttributes;
@@ -82,5 +83,37 @@ public interface TeamDao {
     @Delete
     @StatementAttributes(consistencyLevel = "LOCAL_QUORUM")
     boolean delete(Team team) throws Exception;
+    
+    
+    /**
+     * Adds a member to the specified team
+     * 
+     * @param id        the ID of the team to which to add the member
+     * @param userId    the ID of the user to add
+     */
+    @Query("INSERT INTO team_members (id, user_id) VALUES (:id, :userId)")
+    @StatementAttributes(consistencyLevel = "LOCAL_QUORUM")
+    void addTeamMember(@CqlName("id") UUID id, @CqlName("userId") String userId);
+    
+    
+    /**
+     * Removes a member from the specified team
+     * 
+     * @param id        the ID of the team from which to remove the member
+     * @param userId    the ID of the user to remove
+     */
+    @Query("DELETE FROM team_members WHERE id = :id AND user_id = :userId")
+    @StatementAttributes(consistencyLevel = "LOCAL_QUORUM")
+    void removeTeamMember(@CqlName("id") UUID id, @CqlName("userId") String userId);
+
+    
+    /**
+     * Returns the list of member IDs for the specified team
+     * 
+     * @param id        the ID of the team for which to retrieve the member IDs
+     * @return the list of member IDs for the specified team
+     */
+    @Query("SELECT * from team_members WHERE id = :id")
+    ResultSet teamMembers(@CqlName("id") UUID id);
     
 }

@@ -49,8 +49,9 @@ CREATE TABLE IF NOT EXISTS asakusa.teams (
 
 
 CREATE TABLE IF NOT EXISTS asakusa.team_members (
-    team_id uuid PRIMARY KEY,
-    user_id text
+    id uuid,
+    user_id text,
+    PRIMARY KEY (("id"), "user_id")
 ) WITH COMMENT = 'Retrieve the members of a team';
 
 

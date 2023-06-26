@@ -4,10 +4,14 @@ package com.akwabasystems.asakusa.dao.impl;
 import com.akwabasystems.asakusa.BaseTestSuite;
 import com.akwabasystems.asakusa.dao.TeamDao;
 import com.akwabasystems.asakusa.model.Team;
+import com.akwabasystems.asakusa.model.User;
 import com.akwabasystems.asakusa.repository.RepositoryMapper;
 import com.akwabasystems.asakusa.utils.TestUtils;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.PagingIterable;
+import com.datastax.oss.driver.api.core.cql.ResultSet;
+import com.datastax.oss.driver.api.core.cql.Row;
+import java.util.List;
 import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -137,6 +141,30 @@ public class TeamDaoTests extends BaseTestSuite {
         
         boolean deleted = teamDao.delete(team);
         assertThat(deleted).isTrue();
+        
+    }
+    
+    @Test
+    public void testAddTeamMember() throws Exception {
+        TeamDao teamDao = mapper.teamDao();
+        
+        Team team = TestUtils.defaultTeam();
+        teamDao.create(team);
+        
+        User user = TestUtils.defaultUser();
+        teamDao.addTeamMember(team.getId(), user.getUserId());
+        
+        ResultSet teamMembersResult = teamDao.teamMembers(team.getId());
+        List<Row> rows = teamMembersResult.all();
+        
+        assertThat(rows.isEmpty()).isFalse();
+        
+        teamDao.removeTeamMember(team.getId(), user.getUserId());
+        
+        teamMembersResult = teamDao.teamMembers(team.getId());
+        rows = teamMembersResult.all();
+        
+        assertThat(rows.isEmpty()).isTrue();
         
     }
     

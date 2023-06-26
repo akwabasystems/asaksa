@@ -149,15 +149,16 @@ public class AsakusaRepository {
 
         /**
          * CREATE TABLE IF NOT EXISTS team_members (
-         *   team_id uuid PRIMARY KEY,
-         *   user_id text
+         *   id uuid,
+         *   user_id text,
+         *   PRIMARY KEY (("id"), "user_id")
          * ) WITH COMMENT = 'Retrieve the members of a team';
          */
         cqlSession.execute(
             createTable(keyspaceName, SchemaNames.TABLE_TEAM_MEMBERS)
                     .ifNotExists()
-                    .withPartitionKey(SchemaNames.COLUMN_TEAM_ID, DataTypes.UUID)
-                    .withColumn(SchemaNames.COLUMN_USER_ID, DataTypes.TEXT)
+                    .withPartitionKey(SchemaNames.COLUMN_ID, DataTypes.UUID)
+                    .withClusteringColumn(SchemaNames.COLUMN_USER_ID, DataTypes.TEXT)
                     .withComment("Retrieve the members of a team")
                     .build());
         logger.info(String.format("Table '%s' has been created (if needed)", SchemaNames.TABLE_TEAM_MEMBERS.asInternal()));
