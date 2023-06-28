@@ -394,7 +394,7 @@ public class AsakusaRepository {
         /**
          * CREATE TABLE IF NOT EXISTS project_activity (
          *   project_id uuid,
-         *   id timeuuid,
+         *   id uuid,
          *   type text,
          *   actor text,
          *   details text,
@@ -406,7 +406,7 @@ public class AsakusaRepository {
             createTable(keyspaceName, SchemaNames.TABLE_PROJECT_ACTIVITY)
                     .ifNotExists()
                     .withPartitionKey(SchemaNames.COLUMN_PROJECT_ID, DataTypes.UUID)
-                    .withClusteringColumn(SchemaNames.COLUMN_ID, DataTypes.TIMEUUID)
+                    .withClusteringColumn(SchemaNames.COLUMN_ID, DataTypes.UUID)
                     .withColumn(SchemaNames.COLUMN_TYPE, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_ACTOR, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_DETAILS, DataTypes.TEXT)

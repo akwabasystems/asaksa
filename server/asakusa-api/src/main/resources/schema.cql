@@ -161,7 +161,7 @@ CREATE TABLE IF NOT EXISTS asakusa.tags (
 
 CREATE TABLE IF NOT EXISTS asakusa.project_activity (
     project_id uuid,
-    id timeuuid,
+    id uuid,
     type text,
     actor text,
     details text,

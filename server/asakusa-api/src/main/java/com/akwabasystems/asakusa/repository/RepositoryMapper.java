@@ -1,6 +1,7 @@
 
 package com.akwabasystems.asakusa.repository;
 
+import com.akwabasystems.asakusa.dao.ProjectActivityDao;
 import com.akwabasystems.asakusa.dao.ProjectDao;
 import com.akwabasystems.asakusa.dao.TaskDao;
 import com.akwabasystems.asakusa.dao.TeamDao;
@@ -26,6 +27,9 @@ public interface RepositoryMapper {
     
     @DaoFactory
     ProjectDao projectDao();
+    
+    @DaoFactory
+    ProjectActivityDao projectActivityDao();
     
     @DaoFactory
     TaskDao taskDao();

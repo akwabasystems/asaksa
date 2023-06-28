@@ -3,6 +3,7 @@ package com.akwabasystems.asakusa.config;
 
 import com.akwabasystems.asakusa.dao.helper.AddressToMapCodec;
 import com.akwabasystems.asakusa.dao.helper.JSONObjectToTextCodec;
+import com.akwabasystems.asakusa.model.ActivityType;
 import com.akwabasystems.asakusa.model.Address;
 import com.akwabasystems.asakusa.model.Gender;
 import com.akwabasystems.asakusa.model.ItemPriority;
@@ -94,6 +95,12 @@ public class CassandraConfiguration {
          * of the UserCredentials class
          */
         TypeCodec<Role> roleCodec = ExtraTypeCodecs.enumNamesOf(Role.class);
+        
+        /** 
+         * Register the ActivityType codec to encode and decode the "type" field 
+         * of the ProjectActivity class
+         */
+        TypeCodec<ActivityType> activityTypeCodec = ExtraTypeCodecs.enumNamesOf(ActivityType.class);
 
        /** 
         * Register the codecs to encode and decode the "ItemStatus" 
@@ -116,7 +123,8 @@ public class CassandraConfiguration {
                         jsonCodec, 
                         roleCodec,
                         statusCodec,
-                        priorityCodec
+                        priorityCodec,
+                        activityTypeCodec
                     )
                     .build();
 
