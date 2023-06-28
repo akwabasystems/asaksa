@@ -1,6 +1,7 @@
 
 package com.akwabasystems.asakusa.repository;
 
+import com.akwabasystems.asakusa.dao.PhoneNumberDao;
 import com.akwabasystems.asakusa.dao.ProjectActivityDao;
 import com.akwabasystems.asakusa.dao.ProjectDao;
 import com.akwabasystems.asakusa.dao.TaskDao;
@@ -33,6 +34,9 @@ public interface RepositoryMapper {
     
     @DaoFactory
     TaskDao taskDao();
+    
+    @DaoFactory
+    PhoneNumberDao phoneNumberDao();
     
     static MapperBuilder<RepositoryMapper> builder(CqlSession cqlSession) {
         return new RepositoryMapperBuilder(cqlSession);

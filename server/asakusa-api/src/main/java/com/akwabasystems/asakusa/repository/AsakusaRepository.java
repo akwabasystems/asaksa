@@ -262,7 +262,7 @@ public class AsakusaRepository {
         /**
          * CREATE TABLE IF NOT EXISTS project_discussions (
          *   project_id uuid,
-         *   id timeuuid,
+         *   id uuid,
          *   author_id text,
          *   title text,
          *   created_date text,
@@ -273,7 +273,7 @@ public class AsakusaRepository {
             createTable(keyspaceName, SchemaNames.TABLE_PROJECT_DISCUSSIONS)
                     .ifNotExists()
                     .withPartitionKey(SchemaNames.COLUMN_PROJECT_ID, DataTypes.UUID)
-                    .withClusteringColumn(SchemaNames.COLUMN_ID, DataTypes.TIMEUUID)
+                    .withClusteringColumn(SchemaNames.COLUMN_ID, DataTypes.UUID)
                     .withColumn(SchemaNames.COLUMN_AUTHOR_ID, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_TITLE, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_CREATED_DATE, DataTypes.TEXT)
@@ -284,7 +284,7 @@ public class AsakusaRepository {
          * CREATE TABLE IF NOT EXISTS user_discussions (
          *   author_id text PRIMARY KEY,
          *   project_id uuid,
-         *   discussion_id timeuuid
+         *   discussion_id uuid
          * ) WITH COMMENT = 'Retrieve the discussions for a user';
          */
         cqlSession.execute(
@@ -292,7 +292,7 @@ public class AsakusaRepository {
                     .ifNotExists()
                     .withPartitionKey(SchemaNames.COLUMN_AUTHOR_ID, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_PROJECT_ID, DataTypes.UUID)
-                    .withColumn(SchemaNames.COLUMN_DISCUSSION_ID, DataTypes.TIMEUUID)
+                    .withColumn(SchemaNames.COLUMN_DISCUSSION_ID, DataTypes.UUID)
                     .withComment("Retrieve the discussions for a user")
                     .build());
         logger.info(String.format("Table '%s' has been created (if needed)", SchemaNames.TABLE_USER_DISCUSSIONS.asInternal()));
@@ -300,8 +300,8 @@ public class AsakusaRepository {
         /**
          * CREATE TABLE IF NOT EXISTS discussion_messages (
          *   project_id uuid,
-         *   discussion_id timeuuid,
-         *   id timeuuid,
+         *   discussion_id uuid,
+         *   id uuid,
          *   author_id text,
          *   body text,
          *   created_date text,
@@ -312,8 +312,8 @@ public class AsakusaRepository {
             createTable(keyspaceName, SchemaNames.TABLE_DISCUSSION_MESSAGES)
                     .ifNotExists()
                     .withPartitionKey(SchemaNames.COLUMN_PROJECT_ID, DataTypes.UUID)
-                    .withPartitionKey(SchemaNames.COLUMN_DISCUSSION_ID, DataTypes.TIMEUUID)
-                    .withClusteringColumn(SchemaNames.COLUMN_ID, DataTypes.TIMEUUID)
+                    .withPartitionKey(SchemaNames.COLUMN_DISCUSSION_ID, DataTypes.UUID)
+                    .withClusteringColumn(SchemaNames.COLUMN_ID, DataTypes.UUID)
                     .withColumn(SchemaNames.COLUMN_AUTHOR_ID, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_BODY, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_CREATED_DATE, DataTypes.TEXT)
@@ -418,7 +418,7 @@ public class AsakusaRepository {
         /**
          * CREATE TABLE IF NOT EXISTS phone_numbers (
          *   user_id text PRIMARY KEY,
-         *   id timeuuid,
+         *   id uuid,
          *   country_id text,
          *   country_code text,
          *   number text,

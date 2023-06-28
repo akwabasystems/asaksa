@@ -4,6 +4,7 @@ package com.akwabasystems.asakusa.model;
 import com.datastax.oss.driver.api.mapper.annotations.CqlName;
 import com.datastax.oss.driver.api.mapper.annotations.Entity;
 import com.datastax.oss.driver.api.mapper.annotations.NamingStrategy;
+import com.datastax.oss.driver.api.mapper.annotations.PartitionKey;
 import com.datastax.oss.driver.api.mapper.entity.naming.NamingConvention;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
@@ -15,7 +16,9 @@ import java.util.UUID;
 @NamingStrategy(convention = NamingConvention.SNAKE_CASE_INSENSITIVE)
 public final class PhoneNumber {
 
+    @PartitionKey
     private String userId;
+    
     private UUID id;
     private String number;
     private String formattedNumber;

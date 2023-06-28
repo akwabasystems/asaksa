@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS asakusa.user_tasks (
 
 CREATE TABLE IF NOT EXISTS asakusa.project_discussions (
     project_id uuid,
-    id timeuuid,
+    id uuid,
     author_id text,
     title text,
     created_date text,
@@ -114,14 +114,14 @@ CREATE TABLE IF NOT EXISTS asakusa.project_discussions (
 CREATE TABLE IF NOT EXISTS asakusa.user_discussions (
     author_id text PRIMARY KEY,
     project_id uuid,
-    discussion_id timeuuid
+    discussion_id uuid
 ) WITH COMMENT = 'Retrieve the discussions for a user';
 
 
 CREATE TABLE IF NOT EXISTS asakusa.discussion_messages (
     project_id uuid,
-    discussion_id timeuuid,
-    id timeuuid,
+    discussion_id uuid,
+    id uuid,
     author_id text,
     body text,
     created_date text,
@@ -172,7 +172,7 @@ CREATE TABLE IF NOT EXISTS asakusa.project_activity (
 
 CREATE TABLE IF NOT EXISTS asakusa.phone_numbers (
     user_id text PRIMARY KEY,
-    id timeuuid,
+    id uuid,
     country_id text,
     country_code text,
     number text,
