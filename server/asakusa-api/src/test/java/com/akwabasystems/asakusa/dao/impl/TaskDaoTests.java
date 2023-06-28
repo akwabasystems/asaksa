@@ -119,7 +119,7 @@ public class TaskDaoTests extends BaseTestSuite {
     
     
     @Test
-    public void testRetrieveTasksByAssignee() throws Exception {
+    public void testAssignAndUnassignTask() throws Exception {
         TaskDao taskDao = mapper.taskDao();
         
         User user = TestUtils.defaultUser();
@@ -131,20 +131,56 @@ public class TaskDaoTests extends BaseTestSuite {
         task.setLastModifiedDate(Timeline.currentDateTimeUTCString());
         
         taskDao.create(task);
-        taskDao.assignTask(project.getId(), task.getId(), user.getUserId());
+        taskDao.assignTask(task, user.getUserId());
+        
+        Task assignedTask = taskDao.findById(project.getId(), task.getId());
+        assertThat(assignedTask).isNotNull();
+        assertThat(assignedTask.getAssigneeId()).isEqualTo(user.getUserId());
+        
+        ResultSet userTasksResult = taskDao.findTasksByAssignee(project.getId(), user.getUserId());
+        List<Row> rows = userTasksResult.all();
+        assertThat(rows.isEmpty()).isFalse();
+        
+        taskDao.unassignTask(assignedTask, user.getUserId());
+        
+        Task taskById = taskDao.findById(project.getId(), assignedTask.getId());
+        assertThat(taskById.getAssigneeId()).isNull();
+        
+        userTasksResult = taskDao.findTasksByAssignee(project.getId(), user.getUserId());
+        rows = userTasksResult.all();
+        assertThat(rows.isEmpty()).isTrue();
+        
+    }
+    
+    
+    @Test
+    public void testDeleteAssignedTask() throws Exception {
+        TaskDao taskDao = mapper.taskDao();
+        
+        User user = TestUtils.defaultUser();
+        Project project = TestUtils.defaultProject();
+        Task task = new Task(project.getId(), UUID.randomUUID(), 
+            "Task " + TestUtils.randomSuffix());
+        task.setStartDate(Timeline.currentDateTimeUTCString());
+        task.setCreatedDate(Timeline.currentDateTimeUTCString());
+        task.setLastModifiedDate(Timeline.currentDateTimeUTCString());
+        
+        taskDao.create(task);
+        taskDao.assignTask(task, user.getUserId());
+        
+        Task assignedTask = taskDao.findById(project.getId(), task.getId());
+        assertThat(assignedTask).isNotNull();
+        assertThat(assignedTask.getAssigneeId()).isEqualTo(user.getUserId());
         
         ResultSet userTasksResult = taskDao.findTasksByAssignee(project.getId(), user.getUserId());
         List<Row> rows = userTasksResult.all();
         
         assertThat(rows.isEmpty()).isFalse();
         
-        taskDao.unassignTask(project.getId(), task.getId(), user.getUserId());
+        taskDao.deleteTask(assignedTask);
         
-        userTasksResult = taskDao.findTasksByAssignee(project.getId(), user.getUserId());
-        rows = userTasksResult.all();
-        
-        assertThat(rows.isEmpty()).isTrue();
+        Task taskById = taskDao.findById(project.getId(), assignedTask.getId());
+        assertThat(taskById).isNull();
         
     }
-    
 }

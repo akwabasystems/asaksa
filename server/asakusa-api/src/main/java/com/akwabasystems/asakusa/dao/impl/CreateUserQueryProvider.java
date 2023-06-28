@@ -106,7 +106,7 @@ public class CreateUserQueryProvider {
        
         /** Create new user */
         BoundStatementBuilder insertUser = preparedInsertUser.boundStatementBuilder();
-        userHelper.set(user, insertUser, NullSavingStrategy.DO_NOT_SET, false);
+        userHelper.set(user, insertUser, NullSavingStrategy.SET_TO_NULL, false);
         
         /** Add user credentials */
         UserCredentials credentials = new UserCredentials(user.getUserId(), PasswordUtils.hash(password));
@@ -114,7 +114,7 @@ public class CreateUserQueryProvider {
         
         BoundStatementBuilder insertCredentials = preparedInsertCredentials.boundStatementBuilder();
         credentialsHelper.set(credentials, insertCredentials, 
-                NullSavingStrategy.DO_NOT_SET, false);
+                NullSavingStrategy.SET_TO_NULL, false);
         
         BatchStatementBuilder batchStart = BatchStatement.builder(BatchType.UNLOGGED)
                                                 .addStatement(insertUser.build())

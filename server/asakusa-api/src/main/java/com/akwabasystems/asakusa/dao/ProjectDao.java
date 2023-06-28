@@ -5,14 +5,17 @@ import com.akwabasystems.asakusa.model.Project;
 import com.datastax.oss.driver.api.core.PagingIterable;
 import com.datastax.oss.driver.api.mapper.annotations.CqlName;
 import com.datastax.oss.driver.api.mapper.annotations.Dao;
+import com.datastax.oss.driver.api.mapper.annotations.DefaultNullSavingStrategy;
 import com.datastax.oss.driver.api.mapper.annotations.Insert;
 import com.datastax.oss.driver.api.mapper.annotations.Select;
 import com.datastax.oss.driver.api.mapper.annotations.StatementAttributes;
 import com.datastax.oss.driver.api.mapper.annotations.Update;
+import static com.datastax.oss.driver.api.mapper.entity.saving.NullSavingStrategy.SET_TO_NULL;
 import java.util.UUID;
 
 
 @Dao
+@DefaultNullSavingStrategy(SET_TO_NULL)
 public interface ProjectDao {
 
     /**
@@ -45,17 +48,7 @@ public interface ProjectDao {
      */
     @Select
     Project findById(UUID teamId, UUID id);
-    
-    
-    /**
-     * Deletes the specified project
-     * 
-     * @param project      the project to delete
-     * @return true if the project is deleted successfully; otherwise, returns false
-     * /
-    @Delete
-    @StatementAttributes(consistencyLevel = "LOCAL_QUORUM")
-    boolean delete(Project project) throws Exception;*/
+
     
     /**
      * Returns the list of all the projects for the specified team

@@ -87,7 +87,7 @@ public class CreateTeamQueryProvider {
         /** Create new user */
         BoundStatementBuilder insertTeam = preparedInsertTeam.boundStatementBuilder();
         insertTeam.setConsistencyLevel(ConsistencyLevel.LOCAL_QUORUM);
-        teamHelper.set(team, insertTeam, NullSavingStrategy.DO_NOT_SET, false);
+        teamHelper.set(team, insertTeam, NullSavingStrategy.SET_TO_NULL, false);
         
         ResultSet resultSet = session.execute(insertTeam.build());
         

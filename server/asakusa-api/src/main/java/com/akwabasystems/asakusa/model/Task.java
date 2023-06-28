@@ -10,6 +10,7 @@ import com.datastax.oss.driver.api.mapper.entity.naming.NamingConvention;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import org.springframework.lang.Nullable;
 
 
 @Entity
@@ -25,6 +26,8 @@ public class Task {
     
     private String title;
     private String description;
+    
+    @Nullable
     private String assigneeId;
     private UUID dependsOn;
     private String startDate;

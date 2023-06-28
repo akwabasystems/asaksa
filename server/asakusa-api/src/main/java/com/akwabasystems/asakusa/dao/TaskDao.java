@@ -2,19 +2,24 @@
 package com.akwabasystems.asakusa.dao;
 
 import com.akwabasystems.asakusa.model.Task;
+import com.akwabasystems.asakusa.utils.Timeline;
 import com.datastax.oss.driver.api.core.PagingIterable;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.mapper.annotations.CqlName;
 import com.datastax.oss.driver.api.mapper.annotations.Dao;
+import com.datastax.oss.driver.api.mapper.annotations.DefaultNullSavingStrategy;
+import com.datastax.oss.driver.api.mapper.annotations.Delete;
 import com.datastax.oss.driver.api.mapper.annotations.Insert;
 import com.datastax.oss.driver.api.mapper.annotations.Query;
 import com.datastax.oss.driver.api.mapper.annotations.Select;
 import com.datastax.oss.driver.api.mapper.annotations.StatementAttributes;
 import com.datastax.oss.driver.api.mapper.annotations.Update;
+import static com.datastax.oss.driver.api.mapper.entity.saving.NullSavingStrategy.SET_TO_NULL;
 import java.util.UUID;
 
 
 @Dao
+@DefaultNullSavingStrategy(SET_TO_NULL)
 public interface TaskDao {
 
     /**
@@ -68,9 +73,9 @@ public interface TaskDao {
      */
     @Query("INSERT INTO user_tasks (assignee_id, project_id, task_id) VALUES (:userId, :projectId, :taskId)")
     @StatementAttributes(consistencyLevel = "LOCAL_QUORUM")
-    void assignTask(@CqlName("projectId") UUID projectId, 
-                    @CqlName("taskId") UUID taskId, 
-                    @CqlName("userId") String userId);
+    void addTaskAssignee(@CqlName("projectId") UUID projectId, 
+                         @CqlName("taskId") UUID taskId, 
+                         @CqlName("userId") String userId);
     
     
     /**
@@ -94,8 +99,75 @@ public interface TaskDao {
      */
     @Query("DELETE FROM user_tasks WHERE assignee_id = :userId AND project_id = :projectId AND task_id = :taskId")
     @StatementAttributes(consistencyLevel = "LOCAL_QUORUM")
-    void unassignTask(@CqlName("projectId") UUID projectId, 
+    void removeTaskAssignee(@CqlName("projectId") UUID projectId, 
                       @CqlName("taskId") UUID taskId, 
                       @CqlName("userId") String userId);
+    
+    /**
+     * Assigns a task to the specified user. 
+     * 
+     * This is the default implementation of {@code TaskDao#addTaskAssignee}. It
+     * updates the appropriate properties of the task before saving it and 
+     * invoking {@code TaskDao@addTaskAssignee}.
+     * 
+     * @param task      the task to assign
+     * @param userId    the ID of the new assignee
+     * @throws an exception if the task cannot be assigned
+     */
+    default void assignTask(Task task, String userId) throws Exception {
+        task.setAssigneeId(userId);
+        task.setLastModifiedDate(Timeline.currentDateTimeUTCString());
+        save(task);
+        addTaskAssignee(task.getProjectId(), task.getId(), userId);
+    }
+    
+    
+    /**
+     * Unassigns a task from the specified user
+     * 
+     * This is the default implementation of {@code TaskDao#removeTaskAssignee}. 
+     * It updates the appropriate properties of the task before saving it and 
+     * invoking {@code TaskDao@removeTaskAssignee}.
+     * 
+     * @param task      the task to unassign
+     * @param userId    the ID of current task assignee
+     * @throws an exception if the task cannot be unassigned
+     */
+    default void unassignTask(Task task, String userId) throws Exception {
+        task.setAssigneeId(null);
+        task.setLastModifiedDate(Timeline.currentDateTimeUTCString());
+        save(task);
+        removeTaskAssignee(task.getProjectId(), task.getId(), userId);
+    }
+    
+    
+    /**
+     * Deletes the specified task
+     * 
+     * @param task      the task to delete
+     * @throws an exception if the task cannot be deleted
+     */
+    @Delete
+    @StatementAttributes(consistencyLevel = "LOCAL_QUORUM")
+    void delete(Task task) throws Exception;
+    
+    
+    /**
+     * Deletes the specified task
+     * 
+     * This is the default implementation of {@code TaskDao#delete}. 
+     * If the task is currently assigned to a user, it removes the assignment
+     * before invoking {@code TaskDao@delete}.
+     * 
+     * @param task      the task to delete
+     * @throws an exception if the task cannot be deleted
+     */
+    default void deleteTask(Task task) throws Exception {
+        if (task.getAssigneeId() != null) {
+            removeTaskAssignee(task.getProjectId(), task.getId(), task.getAssigneeId());
+        }
+        
+        delete(task);
+    }
     
 }
