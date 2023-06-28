@@ -2,10 +2,12 @@
 package com.akwabasystems.asakusa.dao;
 
 import com.akwabasystems.asakusa.model.Project;
+import com.akwabasystems.asakusa.model.Team;
 import com.datastax.oss.driver.api.core.PagingIterable;
 import com.datastax.oss.driver.api.mapper.annotations.CqlName;
 import com.datastax.oss.driver.api.mapper.annotations.Dao;
 import com.datastax.oss.driver.api.mapper.annotations.DefaultNullSavingStrategy;
+import com.datastax.oss.driver.api.mapper.annotations.Delete;
 import com.datastax.oss.driver.api.mapper.annotations.Insert;
 import com.datastax.oss.driver.api.mapper.annotations.Select;
 import com.datastax.oss.driver.api.mapper.annotations.StatementAttributes;
@@ -68,5 +70,15 @@ public interface ProjectDao {
      */
     @Select(customWhereClause = "owner_id = :userId", allowFiltering = true)
     PagingIterable<Project> findProjectsByOwner(@CqlName("userId") String userId);
+    
+    
+    /**
+     * Deletes the specified project
+     * 
+     * @param project      the project to delete
+     */
+    @Delete
+    @StatementAttributes(consistencyLevel = "LOCAL_QUORUM")
+    void delete(Project project) throws Exception;
     
 }

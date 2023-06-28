@@ -13,6 +13,7 @@ import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.Row;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.BeforeAll;
@@ -66,8 +67,11 @@ public class TeamDaoTests extends BaseTestSuite {
         assertThat(teamById.getCreatedDate()).isNotNull();
         assertThat(teamById.getLastModifiedDate()).isNotNull();
         
-        boolean deleted = teamDao.delete(teamById);
-        assertThat(deleted).isTrue();
+        UUID teamId = teamById.getId();
+        teamDao.delete(teamById);
+        
+        teamById = teamDao.findById(teamId);
+        assertThat(teamById).isNull();
         
     }
     
@@ -91,8 +95,12 @@ public class TeamDaoTests extends BaseTestSuite {
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("error.teamAlreadyExists");
         
-        boolean deleted = teamDao.delete(team);
-        assertThat(deleted).isTrue();
+        UUID teamId = team.getId();
+        Team teamById = teamDao.findById(teamId);
+        teamDao.delete(teamById);
+        
+        teamById = teamDao.findById(teamId);
+        assertThat(teamById).isNull();
         
     }
     
@@ -121,8 +129,12 @@ public class TeamDaoTests extends BaseTestSuite {
         assertThat(teamById.getName()).isEqualTo(updatedName);
         assertThat(teamById.getDescription()).isEqualTo(updatedDescription);
         
-        boolean deleted = teamDao.delete(teamById);
-        assertThat(deleted).isTrue();
+        UUID teamId = team.getId();
+        teamById = teamDao.findById(teamId);
+        teamDao.delete(teamById);
+        
+        teamById = teamDao.findById(teamId);
+        assertThat(teamById).isNull();
         
     }
     
@@ -139,10 +151,15 @@ public class TeamDaoTests extends BaseTestSuite {
         
         assertThat(count >= 1).isTrue();
         
-        boolean deleted = teamDao.delete(team);
-        assertThat(deleted).isTrue();
+        UUID teamId = team.getId();
+        Team teamById = teamDao.findById(teamId);
+        teamDao.delete(teamById);
+        
+        teamById = teamDao.findById(teamId);
+        assertThat(teamById).isNull();
         
     }
+    
     
     @Test
     public void testAddTeamMember() throws Exception {
@@ -165,6 +182,13 @@ public class TeamDaoTests extends BaseTestSuite {
         rows = teamMembersResult.all();
         
         assertThat(rows.isEmpty()).isTrue();
+        
+        UUID teamId = team.getId();
+        Team teamById = teamDao.findById(teamId);
+        teamDao.delete(teamById);
+        
+        teamById = teamDao.findById(teamId);
+        assertThat(teamById).isNull();
         
     }
     

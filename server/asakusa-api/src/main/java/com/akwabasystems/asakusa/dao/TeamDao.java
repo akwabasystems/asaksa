@@ -81,11 +81,10 @@ public interface TeamDao {
      * Deletes the specified team
      * 
      * @param team      the team to delete
-     * @return true if the team is deleted successfully; otherwise, returns false
      */
     @Delete
     @StatementAttributes(consistencyLevel = "LOCAL_QUORUM")
-    boolean delete(Team team) throws Exception;
+    void delete(Team team) throws Exception;
     
     
     /**

@@ -62,6 +62,10 @@ public class ProjectDaoTests extends BaseTestSuite {
         assertThat(projectById.getPriority()).isEqualTo(ItemPriority.MEDIUM);
         assertThat(projectById.getCapacity()).isEqualTo(10);
         
+        projectDao.delete(project);
+        
+        projectById = projectDao.findById(team.getId(), project.getId());
+        assertThat(projectById).isNull();
     }
     
     
@@ -89,6 +93,10 @@ public class ProjectDaoTests extends BaseTestSuite {
         assertThat(projectById.getStatus()).isEqualTo(ItemStatus.DONE);
         assertThat(projectById.getPriority()).isEqualTo(ItemPriority.HIGH);
         
+        projectDao.delete(project);
+        
+        projectById = projectDao.findById(team.getId(), project.getId());
+        assertThat(projectById).isNull();
     }
     
     
@@ -110,6 +118,11 @@ public class ProjectDaoTests extends BaseTestSuite {
         assertThat(projectList.isEmpty()).isFalse();
         assertThat(projectList.get(0).getTeamId()).isEqualTo(team.getId());
         
+        Project projectById = projectDao.findById(team.getId(), project.getId());
+        projectDao.delete(project);
+        
+        projectById = projectDao.findById(team.getId(), project.getId());
+        assertThat(projectById).isNull();
     }
     
     
@@ -132,6 +145,20 @@ public class ProjectDaoTests extends BaseTestSuite {
         
         assertThat(projectList.isEmpty()).isFalse();
         assertThat(projectList.get(0).getOwnerId()).isEqualTo(user.getUserId());
+        
+        Project userProject = projectList.get(0);        
+        userProject.setOwnerId(null);
+        projectDao.save(userProject);
+        
+        Project projectById = projectDao.findById(team.getId(), userProject.getId());
+        
+        assertThat(projectById.getOwnerId()).isNull();
+        assertThat(projectById.getName()).isEqualTo(project.getName());
+        
+        projectDao.delete(project);
+        
+        projectById = projectDao.findById(team.getId(), project.getId());
+        assertThat(projectById).isNull();
         
     }
     

@@ -64,6 +64,11 @@ public class TaskDaoTests extends BaseTestSuite {
         assertThat(taskById.getPriority()).isEqualTo(ItemPriority.MEDIUM);
         assertThat(taskById.getEstimatedDuration()).isEqualTo(86400);
         
+        taskDao.deleteTask(taskById);
+        
+        taskById = taskDao.findById(project.getId(), task.getId());
+        assertThat(taskById).isNull();
+        
     }
     
     
@@ -93,6 +98,10 @@ public class TaskDaoTests extends BaseTestSuite {
         assertThat(taskById.getStatus()).isEqualTo(ItemStatus.COMPLETED);
         assertThat(taskById.getPriority()).isEqualTo(ItemPriority.HIGH);
         
+        taskDao.deleteTask(taskById);
+        
+        taskById = taskDao.findById(project.getId(), task.getId());
+        assertThat(taskById).isNull();
     }
     
     
@@ -114,6 +123,12 @@ public class TaskDaoTests extends BaseTestSuite {
         
         assertThat(taskList.isEmpty()).isFalse();
         assertThat(taskList.get(0).getProjectId()).isEqualTo(project.getId());
+        
+        Task taskById = taskDao.findById(project.getId(), task.getId());
+        taskDao.deleteTask(taskById);
+        
+        taskById = taskDao.findById(project.getId(), task.getId());
+        assertThat(taskById).isNull();
         
     }
     
@@ -150,6 +165,10 @@ public class TaskDaoTests extends BaseTestSuite {
         rows = userTasksResult.all();
         assertThat(rows.isEmpty()).isTrue();
         
+        taskDao.deleteTask(taskById);
+        
+        taskById = taskDao.findById(project.getId(), task.getId());
+        assertThat(taskById).isNull();
     }
     
     
