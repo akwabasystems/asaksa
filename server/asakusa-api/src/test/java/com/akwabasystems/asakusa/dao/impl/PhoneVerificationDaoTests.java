@@ -28,7 +28,7 @@ public class PhoneVerificationDaoTests extends BaseTestSuite {
     
     
     @Test
-    public void testTeamDaoInitialization() {
+    public void testDaoInitialization() {
         PhoneVerificationDao phoneVerificationDao = mapper.phoneVerificationDao();
         assertThat(phoneVerificationDao).isNotNull();
     }

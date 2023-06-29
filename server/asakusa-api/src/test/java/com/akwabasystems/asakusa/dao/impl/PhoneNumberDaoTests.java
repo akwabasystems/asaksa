@@ -8,7 +8,6 @@ import com.akwabasystems.asakusa.model.PhoneNumber;
 import com.akwabasystems.asakusa.model.PhoneNumberType;
 import com.akwabasystems.asakusa.model.User;
 import com.akwabasystems.asakusa.repository.RepositoryMapper;
-import com.akwabasystems.asakusa.utils.PrintUtils;
 import com.akwabasystems.asakusa.utils.TestUtils;
 import com.akwabasystems.asakusa.utils.Timeline;
 import com.datastax.oss.driver.api.core.CqlSession;
@@ -34,7 +33,7 @@ public class PhoneNumberDaoTests extends BaseTestSuite {
     
     
     @Test
-    public void testTeamDaoInitialization() {
+    public void testDaoInitialization() {
         PhoneNumberDao phoneNumberDao = mapper.phoneNumberDao();
         assertThat(phoneNumberDao).isNotNull();
     }

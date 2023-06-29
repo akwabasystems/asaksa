@@ -36,7 +36,7 @@ public class ProjectDaoTests extends BaseTestSuite {
     
     
     @Test
-    public void testTeamDaoInitialization() {
+    public void testDaoInitialization() {
         ProjectDao projectDao = mapper.projectDao();
         assertThat(projectDao).isNotNull();
     }

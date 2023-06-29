@@ -50,7 +50,7 @@ public class UserDaoTests extends BaseTestSuite {
     
     
     @Test
-    public void testUserDaoInitialization() {
+    public void testDaoInitialization() {
         UserDao userDao = mapper.userDao();
         assertThat(userDao).isNotNull();
     }
