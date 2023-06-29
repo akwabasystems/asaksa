@@ -6,7 +6,6 @@ import com.datastax.oss.driver.api.mapper.annotations.Entity;
 import com.datastax.oss.driver.api.mapper.annotations.NamingStrategy;
 import com.datastax.oss.driver.api.mapper.annotations.PartitionKey;
 import com.datastax.oss.driver.api.mapper.entity.naming.NamingConvention;
-import java.util.UUID;
 
 
 @Entity
@@ -15,9 +14,7 @@ import java.util.UUID;
 public class DeviceToken {
 
     @PartitionKey
-    private String userId;
-
-    private UUID id;
+    private String deviceId;
     
     @CqlName("device_token")
     private String token;
@@ -27,26 +24,17 @@ public class DeviceToken {
 
     public DeviceToken() {}
 
-    public DeviceToken(String userId, UUID id, String token) {
-        this.userId = userId;
-        this.id = id;
+    public DeviceToken(String deviceId, String token) {
+        this.deviceId = deviceId;
         this.token = token;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getDeviceId() {
+        return deviceId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
     }
 
     public String getToken() {
@@ -75,8 +63,8 @@ public class DeviceToken {
 
     @Override
     public String toString() {
-        return String.format("DeviceToken { userId: %s, token: %s }", 
-                getUserId(), getToken());
+        return String.format("DeviceToken { deviceId: %s, token: %s }", 
+                getDeviceId(), getToken());
     }
     
     @Override
@@ -90,16 +78,14 @@ public class DeviceToken {
         }
 
         DeviceToken token = (DeviceToken) object;
-        return (token.getId() != null && token.getId().equals(getId())) &&
-               (token.getUserId() != null && token.getUserId().equals(getUserId())) &&
+        return (token.getDeviceId() != null && token.getDeviceId().equals(getDeviceId())) &&
                (token.getToken() != null && token.getToken().equals(getToken()));
     }
 
     @Override
     public int hashCode() {
         int result = 17;
-        result = 31 * result * ((getId() != null) ? getId().hashCode() : Integer.hashCode(1));
-        result = 31 * result * ((getUserId() != null) ? getUserId().hashCode() : Integer.hashCode(1));
+        result = 31 * result * ((getDeviceId() != null) ? getDeviceId().hashCode() : Integer.hashCode(1));
         result = 31 * result * ((getToken() != null) ? getToken().hashCode() : Integer.hashCode(1));
 
         return result;

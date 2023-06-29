@@ -68,6 +68,7 @@ public class SchemaNames {
     public static final CqlIdentifier COLUMN_AUTHOR_ID = CqlIdentifier.fromCql("author_id");
     public static final CqlIdentifier COLUMN_DISCUSSION_ID = CqlIdentifier.fromCql("discussion_id");
     public static final CqlIdentifier COLUMN_MEDIA_ID = CqlIdentifier.fromCql("media_id");
+    public static final CqlIdentifier COLUMN_DEVICE_ID = CqlIdentifier.fromCql("device_id");
     
     public static final CqlIdentifier COLUMN_CAPACITY = CqlIdentifier.fromCql("capacity");
     public static final CqlIdentifier COLUMN_STATUS = CqlIdentifier.fromCql("status");

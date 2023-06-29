@@ -467,8 +467,7 @@ public class AsakusaRepository {
         
         /**
          * CREATE TABLE IF NOT EXISTS device_tokens (
-         *   user_id text PRIMARY KEY,
-         *   id uuid,
+         *   device_id text PRIMARY KEY,
          *   device_token text,
          *   created_date text,
          *   last_modified_date text
@@ -477,8 +476,7 @@ public class AsakusaRepository {
         cqlSession.execute(
             createTable(keyspaceName, SchemaNames.TABLE_DEVICE_TOKENS)
                     .ifNotExists()
-                    .withPartitionKey(SchemaNames.COLUMN_USER_ID, DataTypes.TEXT)
-                    .withColumn(SchemaNames.COLUMN_ID, DataTypes.UUID)
+                    .withPartitionKey(SchemaNames.COLUMN_DEVICE_ID, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_DEVICE_TOKEN, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_CREATED_DATE, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_LAST_MODIFIED_DATE, DataTypes.TEXT)

@@ -193,8 +193,7 @@ CREATE TABLE IF NOT EXISTS asakusa.phone_number_verifications (
 
 
 CREATE TABLE IF NOT EXISTS asakusa.device_tokens (
-    user_id text PRIMARY KEY,
-    id uuid,
+    device_id text PRIMARY KEY,
     device_token text,
     created_date text,
     last_modified_date text
