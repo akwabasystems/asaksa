@@ -1,11 +1,14 @@
 
 package com.akwabasystems.asakusa.model;
 
+import com.akwabasystems.asakusa.utils.Timeline;
 import com.datastax.oss.driver.api.mapper.annotations.CqlName;
 import com.datastax.oss.driver.api.mapper.annotations.Entity;
 import com.datastax.oss.driver.api.mapper.annotations.NamingStrategy;
+import com.datastax.oss.driver.api.mapper.annotations.PartitionKey;
 import com.datastax.oss.driver.api.mapper.entity.naming.NamingConvention;
-import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 
@@ -14,17 +17,34 @@ import java.util.UUID;
 @NamingStrategy(convention = NamingConvention.SNAKE_CASE_INSENSITIVE)
 public class PhoneNumberVerification {
 
-    private UUID id;
+    @PartitionKey
     private String phoneNumber;
+    
+    private UUID id;
     private String code;
 
     @CqlName("created_at")
-    private Instant createdDate = Instant.now();
+    private String createdDate;
     
     @CqlName("expires_at")
-    private Instant expirationDate = Instant.now();
+    private String expirationDate;
 
 
+    public PhoneNumberVerification() {}
+    
+    public PhoneNumberVerification(String phoneNumber, String code, UUID id) {
+        this.phoneNumber = phoneNumber;
+        this.code = code;
+        this.id = id;
+        
+        /** Set the validity of the verification code to 10 minutes */
+        ZonedDateTime currentTimeUTC = ZonedDateTime.now(Timeline.timezoneUTC());
+        ZonedDateTime expirationTimeUTC = currentTimeUTC.plus(10, ChronoUnit.MINUTES);
+        createdDate = Timeline.toUTCFormat(currentTimeUTC);
+        expirationDate = Timeline.toUTCFormat(expirationTimeUTC);
+    }
+    
+    
     @Override
     public String toString() {
        return String.format("PhoneNumberVerification { PhoneNumber: '%s', code: '%s', expires: '%s' }", 
@@ -80,19 +100,19 @@ public class PhoneNumberVerification {
         this.code = code;
     }
 
-    public Instant getCreatedDate() {
+    public String getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Instant createdDate) {
+    public void setCreatedDate(String createdDate) {
         this.createdDate = createdDate;
     }
 
-    public Instant getExpirationDate() {
+    public String getExpirationDate() {
         return expirationDate;
     }
 
-    public void setExpirationDate(Instant expirationDate) {
+    public void setExpirationDate(String expirationDate) {
         this.expirationDate = expirationDate;
     }
 

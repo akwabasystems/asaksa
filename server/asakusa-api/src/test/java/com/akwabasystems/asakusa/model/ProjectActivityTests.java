@@ -2,6 +2,7 @@
 package com.akwabasystems.asakusa.model;
 
 import com.akwabasystems.asakusa.BaseTestSuite;
+import com.datastax.oss.driver.api.core.uuid.Uuids;
 import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
@@ -12,7 +13,7 @@ public class ProjectActivityTests extends BaseTestSuite {
     @Test
     public void testProjectActivityCreation() {        
         UUID projectId = UUID.randomUUID();
-        UUID activityId = UUID.randomUUID();
+        UUID activityId = Uuids.timeBased();
         
         ProjectActivity activity = new ProjectActivity(projectId, activityId,
             "jsmith", ActivityType.DISCUSSION);
@@ -22,7 +23,7 @@ public class ProjectActivityTests extends BaseTestSuite {
         assertThat(activity.getActor()).isEqualTo("jsmith");
         assertThat(activity.getType()).isEqualTo(ActivityType.DISCUSSION);
         assertThat(activity.getDetails()).isNotNull();
-        assertThat(activity.getCreatedDate()).isNotNull();
+        assertThat(activity.getCreatedDate()).isNull();
     }
 
     @Test

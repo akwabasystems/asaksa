@@ -1,11 +1,22 @@
 
 package com.akwabasystems.asakusa.config;
 
+import com.akwabasystems.asakusa.dao.helper.AddressToMapCodec;
+import com.akwabasystems.asakusa.dao.helper.JSONObjectToTextCodec;
+import com.akwabasystems.asakusa.model.ActivityType;
+import com.akwabasystems.asakusa.model.Address;
+import com.akwabasystems.asakusa.model.Gender;
+import com.akwabasystems.asakusa.model.ItemPriority;
+import com.akwabasystems.asakusa.model.ItemStatus;
+import com.akwabasystems.asakusa.model.PhoneNumberType;
+import com.akwabasystems.asakusa.model.Role;
 import com.datastax.oss.driver.api.core.CqlIdentifier;
 import com.datastax.oss.driver.api.core.CqlSession;
-import jakarta.annotation.PreDestroy;
+import com.datastax.oss.driver.api.core.type.codec.ExtraTypeCodecs;
+import com.datastax.oss.driver.api.core.type.codec.TypeCodec;
 import java.net.InetSocketAddress;
 import javax.net.ssl.SSLContext;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -60,6 +71,51 @@ public class CassandraConfiguration {
     public CqlSession cqlSession() {
         CqlSession session = null;
 
+        /** 
+         * Register the Gender codec to encode and decode the "gender" field 
+         * of the User class
+         */
+        TypeCodec<Gender> genderCodec = ExtraTypeCodecs.enumNamesOf(Gender.class);
+
+        /**
+         * Register the MapToAddress codec to encode and decode the Address field
+         * of the User class, which is then converted to a <code>map<text,text></code>
+         * in the Cassandra schema.
+         */
+        TypeCodec<Address> addressCodec = new AddressToMapCodec();
+
+        /**
+         * Register the JSONObjectToText codec to encode and decode JSONObject 
+         * fields to their corresponding <code>text</code> representations 
+         * in the Cassandra schema.
+         */
+        TypeCodec<JSONObject> jsonCodec = new JSONObjectToTextCodec();
+
+        /** 
+         * Register the Role codec to encode and decode the "roles" field 
+         * of the UserCredentials class
+         */
+        TypeCodec<Role> roleCodec = ExtraTypeCodecs.enumNamesOf(Role.class);
+        
+        /** 
+         * Register the ActivityType codec to encode and decode the "type" field 
+         * of the ProjectActivity class
+         */
+        TypeCodec<ActivityType> activityTypeCodec = ExtraTypeCodecs.enumNamesOf(ActivityType.class);
+        
+        /** 
+         * Register the PhoneNUmberType codec to encode and decode the "type" field 
+         * of the PhoneNumber class
+         */
+        TypeCodec<PhoneNumberType> phoneTypeCodec = ExtraTypeCodecs.enumNamesOf(PhoneNumberType.class);
+
+       /** 
+        * Register the codecs to encode and decode the "ItemStatus" 
+        * and "ItemPriority" enums
+        */
+        TypeCodec<ItemStatus> statusCodec = ExtraTypeCodecs.enumNamesOf(ItemStatus.class);
+        TypeCodec<ItemPriority> priorityCodec = ExtraTypeCodecs.enumNamesOf(ItemPriority.class);
+            
         try {
 
             session = CqlSession.builder()
@@ -68,6 +124,16 @@ public class CassandraConfiguration {
                     .withLocalDatacenter(getLocalDataCenterName())
                     .withAuthCredentials(getUsername(), getPassword())
                     .withKeyspace(CqlIdentifier.fromCql(getKeyspace()))
+                    .addTypeCodecs(
+                        genderCodec, 
+                        addressCodec, 
+                        jsonCodec, 
+                        roleCodec,
+                        statusCodec,
+                        priorityCodec,
+                        activityTypeCodec,
+                        phoneTypeCodec
+                    )
                     .build();
 
             logger.info(String.format("[Cassandra] Session initialized - keyspace: %s, contact-point: %s%n",

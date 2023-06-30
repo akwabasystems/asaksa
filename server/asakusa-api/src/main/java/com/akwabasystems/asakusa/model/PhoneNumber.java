@@ -4,10 +4,10 @@ package com.akwabasystems.asakusa.model;
 import com.datastax.oss.driver.api.mapper.annotations.CqlName;
 import com.datastax.oss.driver.api.mapper.annotations.Entity;
 import com.datastax.oss.driver.api.mapper.annotations.NamingStrategy;
+import com.datastax.oss.driver.api.mapper.annotations.PartitionKey;
 import com.datastax.oss.driver.api.mapper.entity.naming.NamingConvention;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.Phonenumber;
-import java.time.Instant;
 import java.util.UUID;
 
 
@@ -16,7 +16,9 @@ import java.util.UUID;
 @NamingStrategy(convention = NamingConvention.SNAKE_CASE_INSENSITIVE)
 public final class PhoneNumber {
 
+    @PartitionKey
     private String userId;
+    
     private UUID id;
     private String number;
     private String formattedNumber;
@@ -24,8 +26,8 @@ public final class PhoneNumber {
     private String countryCode;
     private PhoneNumberType type = PhoneNumberType.MOBILE;
     private ItemStatus status = ItemStatus.UNVERIFIED;
-    private Instant createdDate = Instant.now();
-    private Instant lastModifiedDate = Instant.now();
+    private String createdDate;
+    private String lastModifiedDate;
     
     public PhoneNumber() { }
     
@@ -189,19 +191,19 @@ public final class PhoneNumber {
         this.status = status;
     }
 
-    public Instant getCreatedDate() {
+    public String getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Instant createdDate) {
+    public void setCreatedDate(String createdDate) {
         this.createdDate = createdDate;
     }
 
-    public Instant getLastModifiedDate() {
+    public String getLastModifiedDate() {
         return lastModifiedDate;
     }
 
-    public void setLastModifiedDate(Instant lastModifiedDate) {
+    public void setLastModifiedDate(String lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
 

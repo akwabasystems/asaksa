@@ -11,29 +11,28 @@ public class DeviceTokenTests extends BaseTestSuite {
     
     @Test
     public void testDeviceTokenCreation() {
-        UUID tokenId = UUID.randomUUID();
+        String deviceId = UUID.randomUUID().toString();
         String token = UUID.randomUUID().toString();
-        DeviceToken deviceToken = new DeviceToken("jsmith", tokenId, token);
+        DeviceToken deviceToken = new DeviceToken(deviceId, token);
         
-        assertThat(deviceToken.getUserId()).isEqualTo("jsmith");
-        assertThat(deviceToken.getId()).isEqualTo(tokenId);
+        assertThat(deviceToken.getDeviceId()).isEqualTo(deviceId);
         assertThat(deviceToken.getToken()).isEqualTo(token);
-        assertThat(deviceToken.getCreatedDate()).isNotNull();
-        assertThat(deviceToken.getLastModifiedDate()).isNotNull();
+        assertThat(deviceToken.getCreatedDate()).isNull();
+        assertThat(deviceToken.getLastModifiedDate()).isNull();
         
     }
 
     @Test
     public void testDeviceTokenEquality() {
-        UUID tokenId = UUID.randomUUID();
+        String deviceId = UUID.randomUUID().toString();
         String token = UUID.randomUUID().toString();
         
-        DeviceToken deviceToken = new DeviceToken("jsmith", tokenId, token);
+        DeviceToken deviceToken = new DeviceToken(deviceId, token);
         
         assertThat(deviceToken.equals(deviceToken)).isTrue();
         assertThat(deviceToken.equals(new Object())).isFalse();
         
-        DeviceToken anotherDeviceToken = new DeviceToken("jsmith", tokenId, "A1B2C3D4");
+        DeviceToken anotherDeviceToken = new DeviceToken(deviceId, "A1B2C3D4");
         assertThat(anotherDeviceToken.equals(deviceToken)).isFalse();
         
         anotherDeviceToken.setToken(deviceToken.getToken());
@@ -43,17 +42,16 @@ public class DeviceTokenTests extends BaseTestSuite {
     
     @Test
     public void testDeviceTokenHashCode() {
-        UUID tokenId = UUID.randomUUID();
+        String deviceId = UUID.randomUUID().toString();
         String token = UUID.randomUUID().toString();
         
-        DeviceToken deviceToken = new DeviceToken("jsmith", tokenId, token);
-        DeviceToken anotherDeviceToken = new DeviceToken("jsmith02", UUID.randomUUID(), "A1B2C3D4");
+        DeviceToken deviceToken = new DeviceToken(deviceId, token);
+        DeviceToken anotherDeviceToken = new DeviceToken("deviceId2", "A1B2C3D4");
         
         assertThat(anotherDeviceToken.equals(deviceToken)).isFalse();
         assertThat(anotherDeviceToken.hashCode() == deviceToken.hashCode()).isFalse();
         
-        anotherDeviceToken.setUserId(deviceToken.getUserId());
-        anotherDeviceToken.setId(deviceToken.getId());
+        anotherDeviceToken.setDeviceId(deviceToken.getDeviceId());
         anotherDeviceToken.setToken(deviceToken.getToken());
         
         assertThat(anotherDeviceToken.hashCode() == deviceToken.hashCode()).isTrue();

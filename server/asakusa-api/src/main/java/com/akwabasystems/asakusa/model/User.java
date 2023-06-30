@@ -6,9 +6,7 @@ import com.datastax.oss.driver.api.mapper.annotations.Entity;
 import com.datastax.oss.driver.api.mapper.annotations.NamingStrategy;
 import com.datastax.oss.driver.api.mapper.annotations.PartitionKey;
 import com.datastax.oss.driver.api.mapper.entity.naming.NamingConvention;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.Locale;
+
 
 
 @Entity
@@ -31,15 +29,15 @@ public class User {
     private String email;
     private boolean emailVerified;
     private Gender gender = Gender.FEMALE;
-    private LocalDate birthDate;
+    private String birthDate;
     private String zoneInfo;
-    private Locale locale;
+    private String locale;
     private String phoneNumber;
     private boolean phoneNumberVerified;
     private Address address;
 
     @CqlName("updated_at")
-    private Instant lastModifiedDate;
+    private String lastModifiedDate;
 
     public User() {}
 
@@ -154,11 +152,11 @@ public class User {
         this.gender = gender;
     }
 
-    public LocalDate getBirthDate() {
+    public String getBirthDate() {
         return birthDate;
     }
 
-    public void setBirthDate(LocalDate birthDate) {
+    public void setBirthDate(String birthDate) {
         this.birthDate = birthDate;
     }
 
@@ -170,11 +168,11 @@ public class User {
         this.zoneInfo = zoneInfo;
     }
 
-    public Locale getLocale() {
+    public String getLocale() {
         return locale;
     }
 
-    public void setLocale(Locale locale) {
+    public void setLocale(String locale) {
         this.locale = locale;
     }
 
@@ -202,11 +200,11 @@ public class User {
         this.address = address;
     }
 
-    public Instant getLastModifiedDate() {
+    public String getLastModifiedDate() {
         return lastModifiedDate;
     }
 
-    public void setLastModifiedDate(Instant lastModifiedDate) {
+    public void setLastModifiedDate(String lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
 
@@ -241,4 +239,5 @@ public class User {
 
         return result;
     }
+
 }

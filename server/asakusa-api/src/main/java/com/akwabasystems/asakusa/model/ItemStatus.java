@@ -16,6 +16,8 @@ public enum ItemStatus {
     
     IN_TESTING,
     
+    DONE,
+    
     COMPLETED,
     
     VERIFIED,

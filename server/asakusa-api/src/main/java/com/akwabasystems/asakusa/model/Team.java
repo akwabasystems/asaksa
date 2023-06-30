@@ -6,7 +6,6 @@ import com.datastax.oss.driver.api.mapper.annotations.Entity;
 import com.datastax.oss.driver.api.mapper.annotations.NamingStrategy;
 import com.datastax.oss.driver.api.mapper.annotations.PartitionKey;
 import com.datastax.oss.driver.api.mapper.entity.naming.NamingConvention;
-import java.time.Instant;
 import java.util.UUID;
 
 
@@ -20,8 +19,8 @@ public class Team {
     
     private String name;
     private String description;
-    private Instant createdDate = Instant.now();
-    private Instant lastModifiedDate = Instant.now();
+    private String createdDate;
+    private String lastModifiedDate;
     
     public Team() {}
     
@@ -59,19 +58,19 @@ public class Team {
         this.description = description;
     }
 
-    public Instant getCreatedDate() {
+    public String getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Instant createdDate) {
+    public void setCreatedDate(String createdDate) {
         this.createdDate = createdDate;
     }
 
-    public Instant getLastModifiedDate() {
+    public String getLastModifiedDate() {
         return lastModifiedDate;
     }
 
-    public void setLastModifiedDate(Instant lastModifiedDate) {
+    public void setLastModifiedDate(String lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
     

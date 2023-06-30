@@ -23,7 +23,7 @@ public class DiscussionTests extends BaseTestSuite {
         assertThat(discussion.getProjectId()).isEqualTo(projectId);
         assertThat(discussion.getTitle()).isEqualTo(title);
         assertThat(discussion.getAuthorId()).isEqualTo(authorId);
-        assertThat(discussion.getCreatedDate()).isNotNull();
+        assertThat(discussion.getCreatedDate()).isNull();
         
     }
 

@@ -23,9 +23,9 @@ public class TaskTests extends BaseTestSuite {
         assertThat(task.getStatus()).isEqualTo(ItemStatus.TODO);
         assertThat(task.getPriority()).isEqualTo(ItemPriority.MEDIUM);
         assertThat(task.getEstimatedDuration()).isEqualTo(86400);
-        assertThat(task.getStartDate()).isNotNull();
-        assertThat(task.getEndDate()).isNotNull();
-        assertThat(task.getCreatedDate()).isNotNull();
+        assertThat(task.getStartDate()).isNull();
+        assertThat(task.getEndDate()).isNull();
+        assertThat(task.getCreatedDate()).isNull();
     }
 
     @Test

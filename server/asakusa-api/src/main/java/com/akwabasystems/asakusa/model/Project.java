@@ -1,16 +1,16 @@
 
 package com.akwabasystems.asakusa.model;
 
+import com.datastax.oss.driver.api.mapper.annotations.ClusteringColumn;
 import com.datastax.oss.driver.api.mapper.annotations.CqlName;
 import com.datastax.oss.driver.api.mapper.annotations.Entity;
 import com.datastax.oss.driver.api.mapper.annotations.NamingStrategy;
 import com.datastax.oss.driver.api.mapper.annotations.PartitionKey;
 import com.datastax.oss.driver.api.mapper.entity.naming.NamingConvention;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import org.springframework.lang.Nullable;
 
 
 @Entity
@@ -19,25 +19,30 @@ import java.util.UUID;
 public class Project {
 
     @PartitionKey
+    private UUID teamId;
+    
+    @ClusteringColumn
     private UUID id;
     
     private String name;
     private String description;
-    private UUID teamId;
+    
+    @Nullable
     private String ownerId;
-    private Instant startDate = Instant.now();
-    private Instant endDate = Instant.now().plus(7, ChronoUnit.DAYS);
-    private Instant deadline = Instant.now().plus(7, ChronoUnit.DAYS);
+    private String startDate;
+    private String endDate;
+    private String deadline;
     private int capacity = 10;
     private ItemStatus status = ItemStatus.TODO;
     private ItemPriority priority = ItemPriority.MEDIUM;
     private Set<String> tags = new HashSet<>();
-    private Instant createdDate = Instant.now();
-    private Instant lastModifiedDate = Instant.now();
+    private String createdDate;
+    private String lastModifiedDate;
             
     public Project() {}
     
-    public Project(UUID id, String name) {
+    public Project(UUID teamId, UUID id, String name) {
+        this.teamId = teamId;
         this.id = id;
         this.name = name;
     }
@@ -82,27 +87,27 @@ public class Project {
         this.ownerId = ownerId;
     }
 
-    public Instant getStartDate() {
+    public String getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Instant startDate) {
+    public void setStartDate(String startDate) {
         this.startDate = startDate;
     }
 
-    public Instant getEndDate() {
+    public String getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Instant endDate) {
+    public void setEndDate(String endDate) {
         this.endDate = endDate;
     }
 
-    public Instant getDeadline() {
+    public String getDeadline() {
         return deadline;
     }
 
-    public void setDeadline(Instant deadline) {
+    public void setDeadline(String deadline) {
         this.deadline = deadline;
     }
 
@@ -138,19 +143,19 @@ public class Project {
         this.tags = tags;
     }
 
-    public Instant getCreatedDate() {
+    public String getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Instant createdDate) {
+    public void setCreatedDate(String createdDate) {
         this.createdDate = createdDate;
     }
 
-    public Instant getLastModifiedDate() {
+    public String getLastModifiedDate() {
         return lastModifiedDate;
     }
 
-    public void setLastModifiedDate(Instant lastModifiedDate) {
+    public void setLastModifiedDate(String lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
 
