@@ -22,7 +22,11 @@ public enum ItemStatus {
     
     VERIFIED,
     
-    UNVERIFIED;
+    UNVERIFIED,
+    
+    ACTIVE,
+
+    INACTIVE;
 
     @Override
     public String toString() {

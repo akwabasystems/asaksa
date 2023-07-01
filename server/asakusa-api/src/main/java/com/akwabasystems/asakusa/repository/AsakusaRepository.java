@@ -483,5 +483,57 @@ public class AsakusaRepository {
                     .build());
         logger.info(String.format("Table '%s' has been created (if needed)", SchemaNames.TABLE_DEVICE_TOKENS.asInternal()));
         
+        
+        /**
+         * CREATE TABLE IF NOT EXISTS membership (
+         *   user_id text PRIMARY KEY,
+         *   id uuid,
+         *   status text,
+         *   type text,
+         *   created_date text,
+         *   last_modified_date text
+         * );
+         */
+        cqlSession.execute(
+            createTable(keyspaceName, SchemaNames.TABLE_MEMBERSHIP)
+                    .ifNotExists()
+                    .withPartitionKey(SchemaNames.COLUMN_USER_ID, DataTypes.TEXT)
+                    .withColumn(SchemaNames.COLUMN_ID, DataTypes.UUID)
+                    .withColumn(SchemaNames.COLUMN_STATUS, DataTypes.TEXT)
+                    .withColumn(SchemaNames.COLUMN_TYPE, DataTypes.TEXT)
+                    .withColumn(SchemaNames.COLUMN_LICENSE_KEY, DataTypes.TEXT)
+                    .withColumn(SchemaNames.COLUMN_SOURCE, DataTypes.TEXT)
+                    .withColumn(SchemaNames.COLUMN_CREATED_DATE, DataTypes.TEXT)
+                    .withColumn(SchemaNames.COLUMN_LAST_MODIFIED_DATE, DataTypes.TEXT)
+                    .build());
+        logger.info(String.format("Table '%s' has been created (if needed)", SchemaNames.TABLE_MEMBERSHIP.asInternal()));
+        
+
+        /**
+         * CREATE TABLE IF NOT EXISTS user_sessions (
+         *   user_id text,
+         *   id timeuuid,
+         *   user_agent text,
+         *   resource text,
+         *   active boolean,
+         *   start_date timestamp,
+         *   end_date timestamp,
+         *   PRIMARY KEY (("user_id"), "id")
+         * ) WITH CLUSTERING ORDER BY ("id" DESC);
+         */
+        cqlSession.execute(
+            createTable(keyspaceName, SchemaNames.TABLE_USER_SESSIONS)
+                    .ifNotExists()
+                    .withPartitionKey(SchemaNames.COLUMN_USER_ID, DataTypes.TEXT)
+                    .withClusteringColumn(SchemaNames.COLUMN_ID, DataTypes.TIMEUUID)
+                    .withColumn(SchemaNames.COLUMN_USER_AGENT, DataTypes.TEXT)
+                    .withColumn(SchemaNames.COLUMN_RESOURCE, DataTypes.TEXT)
+                    .withColumn(SchemaNames.COLUMN_ACTIVE, DataTypes.BOOLEAN)
+                    .withColumn(SchemaNames.COLUMN_START_DATE, DataTypes.TIMESTAMP)
+                    .withColumn(SchemaNames.COLUMN_END_DATE, DataTypes.TIMESTAMP)
+                    .withClusteringOrder(SchemaNames.COLUMN_ID, ClusteringOrder.DESC)
+                    .build());
+        logger.info(String.format("Table '%s' has been created (if needed)", SchemaNames.TABLE_USER_SESSIONS.asInternal()));
+
     }
 }
