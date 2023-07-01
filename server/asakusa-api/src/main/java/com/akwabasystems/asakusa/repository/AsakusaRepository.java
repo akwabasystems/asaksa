@@ -514,8 +514,7 @@ public class AsakusaRepository {
          *   user_id text,
          *   id timeuuid,
          *   user_agent text,
-         *   resource text,
-         *   active boolean,
+         *   status text,
          *   start_date timestamp,
          *   end_date timestamp,
          *   PRIMARY KEY (("user_id"), "id")
@@ -527,8 +526,7 @@ public class AsakusaRepository {
                     .withPartitionKey(SchemaNames.COLUMN_USER_ID, DataTypes.TEXT)
                     .withClusteringColumn(SchemaNames.COLUMN_ID, DataTypes.TIMEUUID)
                     .withColumn(SchemaNames.COLUMN_USER_AGENT, DataTypes.TEXT)
-                    .withColumn(SchemaNames.COLUMN_RESOURCE, DataTypes.TEXT)
-                    .withColumn(SchemaNames.COLUMN_ACTIVE, DataTypes.BOOLEAN)
+                    .withColumn(SchemaNames.COLUMN_STATUS, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_START_DATE, DataTypes.TIMESTAMP)
                     .withColumn(SchemaNames.COLUMN_END_DATE, DataTypes.TIMESTAMP)
                     .withClusteringOrder(SchemaNames.COLUMN_ID, ClusteringOrder.DESC)

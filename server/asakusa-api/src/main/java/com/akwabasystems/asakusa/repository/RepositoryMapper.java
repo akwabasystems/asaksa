@@ -10,6 +10,7 @@ import com.akwabasystems.asakusa.dao.ProjectDao;
 import com.akwabasystems.asakusa.dao.TaskDao;
 import com.akwabasystems.asakusa.dao.TeamDao;
 import com.akwabasystems.asakusa.dao.UserDao;
+import com.akwabasystems.asakusa.dao.UserSessionDao;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.mapper.MapperBuilder;
 import com.datastax.oss.driver.api.mapper.annotations.DaoFactory;
@@ -49,6 +50,9 @@ public interface RepositoryMapper {
     
     @DaoFactory
     MembershipDao membershipDao();
+    
+    @DaoFactory
+    UserSessionDao userSessionDao();
     
     static MapperBuilder<RepositoryMapper> builder(CqlSession cqlSession) {
         return new RepositoryMapperBuilder(cqlSession);

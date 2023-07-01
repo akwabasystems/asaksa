@@ -40,7 +40,7 @@ public class MembershipDaoTests extends BaseTestSuite {
     
     
     @Test
-    public void testAddPhoneNumber() throws Exception {
+    public void testMembership() throws Exception {
         MembershipDao membershipDao = mapper.membershipDao();
         User user = TestUtils.defaultUser();
         
