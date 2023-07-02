@@ -22,6 +22,7 @@ import com.datastax.oss.driver.api.core.uuid.Uuids;
 import jakarta.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -162,12 +163,12 @@ public class UserService {
     
     
     /**
-     * Returns the details for a given user
+     * Finds a user by ID
      * 
-     * @param authTicket        the ticket used to authorize the request
-     * @return the details for a given user
+     * @param authTicket        the auth ticket that contains the ID of the user to find
+     * @return the user with the ID specified in the request
      */
-    public User getUserInfo(AuthorizationTicket authTicket) {
+    public User findUserById(AuthorizationTicket authTicket) {
         UserDao userDao = mapper.userDao();
         return userDao.findById(authTicket.getUserId());
     }
@@ -205,6 +206,41 @@ public class UserService {
         
         return true;
         
+    }
+    
+    
+    /**
+     * Returns the preferences for the specified user
+     * 
+     * @param user      the user for whom to return the preferences
+     * @return the preferences for the specified user
+     */
+    public UserPreferences getUserPreferences(User user) {
+        UserDao userDao = mapper.userDao();
+        return userDao.getPreferences(user.getUserId());
+    }
+    
+    
+    /**
+     * Updates the preferences for the given user
+     * 
+     * @param user          the user for whom to update the preferences
+     * @param settings      a serialized string of the preferences to set
+     * @return the updated user preferences
+     * @throws Exception if the operation fails
+     */
+    public UserPreferences updateUserPreferences(User user, LinkedHashMap settings) throws Exception {
+        UserDao userDao = mapper.userDao();
+        UserPreferences userPreferences = userDao.getPreferences(user.getUserId());
+        JSONObject preferences = new JSONObject(settings);
+
+        preferences.keySet().stream().forEach((String key) -> {
+            userPreferences.getSettings().put(key, preferences.get(key));
+        });
+        
+        userDao.savePreferences(userPreferences);
+        
+        return userPreferences;
     }
     
 }

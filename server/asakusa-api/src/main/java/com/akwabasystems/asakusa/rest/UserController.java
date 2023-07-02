@@ -3,6 +3,7 @@ package com.akwabasystems.asakusa.rest;
 
 import com.akwabasystems.asakusa.model.Gender;
 import com.akwabasystems.asakusa.model.User;
+import com.akwabasystems.asakusa.model.UserPreferences;
 import com.akwabasystems.asakusa.rest.utils.UserResponse;
 import com.akwabasystems.asakusa.rest.service.UserService;
 import com.akwabasystems.asakusa.rest.utils.ApplicationError;
@@ -19,6 +20,7 @@ import lombok.extern.java.Log;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -120,7 +122,7 @@ public class UserController extends BaseController {
                                                  @PathVariable String id) 
                                                       throws Exception {
         String accessToken = (String) request.getHeader(QueryParameter.ACCESS_TOKEN);
-        User user = userService.getUserInfo(getAuthorizationTicket(id, accessToken));
+        User user = userService.findUserById(getAuthorizationTicket(id, accessToken));
         
         if (user == null) {
             ProblemDetail details = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
@@ -161,11 +163,11 @@ public class UserController extends BaseController {
         parameterMap.put(QueryParameter.LOCALE, locale);
         parameterMap.put(QueryParameter.GENDER, gender);
         
-        AuthorizationTicket authTiket = getAuthorizationTicket(id, accessToken);
-        boolean updated = userService.updateAccount(authTiket, parameterMap);
+        AuthorizationTicket authTicket = getAuthorizationTicket(id, accessToken);
+        boolean updated = userService.updateAccount(authTicket, parameterMap);
 
         if (updated) {
-            User updatedUser = userService.getUserInfo(authTiket);
+            User updatedUser = userService.findUserById(authTicket);
             return ResponseEntity.ok(UserResponse.fromUser(updatedUser));
             
         } else {
@@ -178,4 +180,72 @@ public class UserController extends BaseController {
         }
         
     }
+    
+    
+    /**
+     * Handles a request to retrieve the preferences for a given user
+     * 
+     * @param request       the incoming request
+     * @param response      the outgoing response
+     * @param id            the ID of the user for whom to retrieve the preferences
+     * @return a JSON object with the user's preferences
+     * @throws Exception if the request fails
+     */
+    @GetMapping("/{id}/preferences")
+    public ResponseEntity<?> userPreferences(HttpServletRequest request,
+                                             HttpServletResponse response,
+                                             @PathVariable String id) 
+                                                      throws Exception {
+        String accessToken = (String) request.getHeader(QueryParameter.ACCESS_TOKEN);
+        User user = userService.findUserById(getAuthorizationTicket(id, accessToken));
+        
+        if (user == null) {
+            ProblemDetail details = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+            details.setTitle(ApplicationError.USER_NOT_FOUND);
+            details.setInstance(new URI(request.getRequestURI()));
+            return ResponseEntity.of(details).build();
+        } else {
+            UserPreferences preferences = userService.getUserPreferences(user);
+            return ResponseEntity.ok()
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .body(preferences.getSettings().toString());
+        }
+    }
+    
+    
+    /**
+     * Handles a request to update the preferences for a user
+     * 
+     * @param request       the incoming request
+     * @param response      the outgoing response
+     * @param id            the user's ID
+     * @param map           an object that contains the query parameters
+     * @return a JSON object with the updated user details
+     * @throws Exception if the request fails
+     */
+    @PutMapping("/{id}/preferences")
+    public ResponseEntity<?> updateUserPreferences(HttpServletRequest request,
+                                                   HttpServletResponse response,
+                                                   @PathVariable String id,
+                                                   @RequestBody LinkedHashMap<String,Object> map) 
+                                                         throws Exception {
+        String accessToken = (String) request.getHeader(QueryParameter.ACCESS_TOKEN);
+        LinkedHashMap settings = (LinkedHashMap)QueryUtils.getValueRequired(map, QueryParameter.SETTINGS);        
+        
+        AuthorizationTicket authTicket = getAuthorizationTicket(id, accessToken);
+        User user = userService.findUserById(authTicket);
+        
+        if (user == null) {
+            ProblemDetail details = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
+            details.setTitle(ApplicationError.USER_NOT_FOUND);
+            details.setInstance(new URI(request.getRequestURI()));
+            return ResponseEntity.of(details).build();
+        }
+        
+        UserPreferences updatedPreferences = userService.updateUserPreferences(user, settings);
+        return ResponseEntity.ok()
+                             .contentType(MediaType.APPLICATION_JSON)
+                             .body(updatedPreferences.getSettings().toString());
+    }
+    
 }
