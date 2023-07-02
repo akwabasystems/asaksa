@@ -15,6 +15,7 @@ import com.akwabasystems.asakusa.repository.RepositoryMapper;
 import com.akwabasystems.asakusa.rest.utils.AuthorizationTicket;
 import com.akwabasystems.asakusa.rest.utils.ApplicationError;
 import com.akwabasystems.asakusa.rest.utils.QueryParameter;
+import com.akwabasystems.asakusa.utils.PrintUtils;
 import com.akwabasystems.asakusa.utils.Timeline;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.uuid.Uuids;
@@ -171,5 +172,39 @@ public class UserService {
         return userDao.findById(authTicket.getUserId());
     }
     
+    
+    /**
+     * Updates a user account
+     * 
+     * @param authorizationTicket       the ticket used to authorize the request
+     * @param accountDetails            an object with the updated account details
+     * @return true if the user account is updated
+     * @throws Exception if the request fails
+     */
+    public boolean updateAccount(AuthorizationTicket authorizationTicket,
+                                 Map<String,Object> accountDetails) throws Exception {
+        UserDao userDao = mapper.userDao();
+        User user = userDao.findById(authorizationTicket.getUserId());
+        
+        if (user == null) {
+            throw new Exception(ApplicationError.USER_NOT_FOUND);
+        }
+
+        String firstName = (String) accountDetails.get(QueryParameter.FIRST_NAME);
+        String lastName = (String) accountDetails.get(QueryParameter.LAST_NAME);
+        String gender = (String) accountDetails.get(QueryParameter.GENDER);
+        String locale = (String) accountDetails.get(QueryParameter.LOCALE);
+        
+        user.setGivenName(firstName);
+        user.setFamilyName(lastName);
+        user.setGender(Gender.fromString(gender));
+        user.setLocale(locale);
+        user.setLastModifiedDate(Timeline.currentDateTimeUTCString());
+        
+        userDao.update(user);
+        
+        return true;
+        
+    }
     
 }

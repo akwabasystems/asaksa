@@ -11,6 +11,7 @@ import com.datastax.oss.driver.api.core.PagingIterable;
 import com.datastax.oss.driver.api.mapper.annotations.CqlName;
 import com.datastax.oss.driver.api.mapper.annotations.Dao;
 import com.datastax.oss.driver.api.mapper.annotations.DefaultNullSavingStrategy;
+import com.datastax.oss.driver.api.mapper.annotations.Insert;
 import com.datastax.oss.driver.api.mapper.annotations.QueryProvider;
 import com.datastax.oss.driver.api.mapper.annotations.Select;
 import com.datastax.oss.driver.api.mapper.annotations.StatementAttributes;
@@ -77,7 +78,7 @@ public interface UserDao {
      * @param user      the user account to update
      * @throws Exception if the credentials cannot be updated
      */
-    @Update
+    @Insert
     @StatementAttributes(consistencyLevel = "LOCAL_QUORUM")
     void update(User user) throws Exception;
     

@@ -8,7 +8,6 @@ import com.datastax.oss.driver.api.mapper.annotations.PartitionKey;
 import com.datastax.oss.driver.api.mapper.entity.naming.NamingConvention;
 
 
-
 @Entity
 @CqlName("users")
 @NamingStrategy(convention = NamingConvention.SNAKE_CASE_INSENSITIVE)
@@ -34,7 +33,7 @@ public class User {
     private String locale;
     private String phoneNumber;
     private boolean phoneNumberVerified;
-    private Address address;
+    private Address address = Address.withDefaults();
 
     @CqlName("updated_at")
     private String lastModifiedDate;

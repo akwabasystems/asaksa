@@ -6,11 +6,13 @@ import com.akwabasystems.asakusa.model.User;
 import com.akwabasystems.asakusa.rest.utils.UserResponse;
 import com.akwabasystems.asakusa.rest.service.UserService;
 import com.akwabasystems.asakusa.rest.utils.ApplicationError;
+import com.akwabasystems.asakusa.rest.utils.AuthorizationTicket;
 import com.akwabasystems.asakusa.rest.utils.QueryParameter;
 import com.akwabasystems.asakusa.rest.utils.QueryUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import lombok.extern.java.Log;
@@ -22,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -70,7 +73,6 @@ public class UserController extends BaseController {
         parameterMap.put(QueryParameter.LOCALE, locale);
         parameterMap.put(QueryParameter.GENDER, gender);
         
-        QueryUtils.populateMapIfPresent(map, parameterMap, QueryParameter.GENDER);
         QueryUtils.populateMapIfPresent(map, parameterMap, QueryParameter.PHONE_NUMBER);
         QueryUtils.populateMapIfPresent(map, parameterMap, QueryParameter.CLIENT);
         
@@ -126,16 +128,54 @@ public class UserController extends BaseController {
             details.setInstance(new URI(request.getRequestURI()));
             return ResponseEntity.of(details).build();
         } else {
-            UserResponse userResponse = new UserResponse(user.getUserId(), 
-                    user.getGivenName(), user.getFamilyName());
-            userResponse.setEmail(user.getEmail());
-            userResponse.setUsername(user.getPreferredUsername());
-            userResponse.setGender(user.getGender());
-            userResponse.setPicture(user.getPicture());
-            userResponse.setLocale(user.getLocale());
-            userResponse.setPhoneNumber(user.getPhoneNumber());
-            
-            return ResponseEntity.ok(userResponse);
+            return ResponseEntity.ok(UserResponse.fromUser(user));
         }
+    }
+    
+    
+    /**
+     * Handles a request to update a user account
+     * 
+     * @param request       the incoming request
+     * @param response      the outgoing response
+     * @param map           an object that contains the query parameters
+     * @return a JSON object with the updated user details
+     * @throws Exception if the request fails
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateUser(HttpServletRequest request,
+                                        HttpServletResponse response,
+                                        @PathVariable String id,
+                                        @RequestBody LinkedHashMap<String,Object> map) 
+                                                         throws Exception {
+        String accessToken = (String) request.getHeader(QueryParameter.ACCESS_TOKEN);
+
+        String firstName = (String)QueryUtils.getValueRequired(map, QueryParameter.FIRST_NAME);
+        String lastName = (String)QueryUtils.getValueRequired(map, QueryParameter.LAST_NAME);
+        String locale = (String) QueryUtils.getValueWithDefault(map, QueryParameter.LOCALE, "en");
+        String gender = (String) QueryUtils.getValueWithDefault(map, QueryParameter.GENDER, "FEMALE");
+        
+        Map<String,Object> parameterMap = new HashMap<>();
+        parameterMap.put(QueryParameter.FIRST_NAME, firstName);
+        parameterMap.put(QueryParameter.LAST_NAME, lastName);
+        parameterMap.put(QueryParameter.LOCALE, locale);
+        parameterMap.put(QueryParameter.GENDER, gender);
+        
+        AuthorizationTicket authTiket = getAuthorizationTicket(id, accessToken);
+        boolean updated = userService.updateAccount(authTiket, parameterMap);
+
+        if (updated) {
+            User updatedUser = userService.getUserInfo(authTiket);
+            return ResponseEntity.ok(UserResponse.fromUser(updatedUser));
+            
+        } else {
+            log.severe(String.format("[UserController#updateUser] - Error updating account for user %s", id));
+            
+            ProblemDetail details = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+            details.setTitle(ApplicationError.HTTP_ERROR);
+            details.setInstance(new URI(request.getRequestURI()));
+            return ResponseEntity.of(details).build();
+        }
+        
     }
 }
