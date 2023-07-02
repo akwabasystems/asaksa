@@ -46,7 +46,7 @@ public class UserSessionDaoTests extends BaseTestSuite {
         User user = TestUtils.defaultUser();
         
         UserSession session = new UserSession(user.getUserId(), Uuids.timeBased());
-        session.setUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30");
+        session.setClient("iPhone 12 Mini");
 
         sessionDao.create(session);
         

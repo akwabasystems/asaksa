@@ -97,7 +97,6 @@ public class SchemaNames {
     public static final CqlIdentifier COLUMN_SETTINGS = CqlIdentifier.fromCql("settings");
     public static final CqlIdentifier COLUMN_LICENSE_KEY = CqlIdentifier.fromCql("license_key");
     public static final CqlIdentifier COLUMN_SOURCE = CqlIdentifier.fromCql("source");
-    public static final CqlIdentifier COLUMN_USER_AGENT = CqlIdentifier.fromCql("user_agent");
-    public static final CqlIdentifier COLUMN_RESOURCE = CqlIdentifier.fromCql("resource");
+    public static final CqlIdentifier COLUMN_CLIENT = CqlIdentifier.fromCql("client");
     public static final CqlIdentifier COLUMN_ACTIVE = CqlIdentifier.fromCql("active");
 }

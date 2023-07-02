@@ -214,7 +214,7 @@ CREATE TABLE IF NOT EXISTS membership (
 CREATE TABLE IF NOT EXISTS user_sessions (
     user_id text,
     id timeuuid,
-    user_agent text,
+    client text,
     status text,
     start_date timestamp,
     end_date timestamp,

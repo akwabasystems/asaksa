@@ -23,7 +23,7 @@ public class UserSession {
     @ClusteringColumn
     private UUID id;
     
-    private String userAgent;
+    private String client;
     private ItemStatus status = ItemStatus.ACTIVE;
     private Instant startDate = Instant.now(Clock.systemUTC());
     private Instant endDate;
@@ -51,12 +51,12 @@ public class UserSession {
         this.id = id;
     }
 
-    public String getUserAgent() {
-        return userAgent;
+    public String getClient() {
+        return client;
     }
 
-    public void setUserAgent(String userAgent) {
-        this.userAgent = userAgent;
+    public void setClient(String client) {
+        this.client = client;
     }
 
     public ItemStatus getStatus() {

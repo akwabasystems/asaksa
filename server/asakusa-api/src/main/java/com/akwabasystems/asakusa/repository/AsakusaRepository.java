@@ -513,7 +513,7 @@ public class AsakusaRepository {
          * CREATE TABLE IF NOT EXISTS user_sessions (
          *   user_id text,
          *   id timeuuid,
-         *   user_agent text,
+         *   client text,
          *   status text,
          *   start_date timestamp,
          *   end_date timestamp,
@@ -525,7 +525,7 @@ public class AsakusaRepository {
                     .ifNotExists()
                     .withPartitionKey(SchemaNames.COLUMN_USER_ID, DataTypes.TEXT)
                     .withClusteringColumn(SchemaNames.COLUMN_ID, DataTypes.TIMEUUID)
-                    .withColumn(SchemaNames.COLUMN_USER_AGENT, DataTypes.TEXT)
+                    .withColumn(SchemaNames.COLUMN_CLIENT, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_STATUS, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_START_DATE, DataTypes.TIMESTAMP)
                     .withColumn(SchemaNames.COLUMN_END_DATE, DataTypes.TIMESTAMP)
