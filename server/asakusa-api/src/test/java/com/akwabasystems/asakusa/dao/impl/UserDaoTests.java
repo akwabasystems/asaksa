@@ -87,7 +87,7 @@ public class UserDaoTests extends BaseTestSuite {
         assertThat(newUser.getNickname()).isNull();
         assertThat(newUser.isEmailVerified()).isTrue();
         assertThat(newUser.getGender()).isEqualTo(Gender.MALE);
-        assertThat(newUser.getAddress()).isNull();
+        assertThat(newUser.getAddress()).isNotNull();
         
         User userById = userDao.findById(user.getUserId());
         

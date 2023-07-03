@@ -15,4 +15,15 @@ public class Address {
     private String postalCode;
     private String country;
     
+    public static Address withDefaults() {
+        Address address = new Address();
+        address.setStreet("");
+        address.setCity("");
+        address.setStateOrProvince("CA");
+        address.setPostalCode("");
+        address.setCountry("USA");
+        
+        return address;
+    }
+    
 }

@@ -8,6 +8,7 @@ import com.akwabasystems.asakusa.model.Address;
 import com.akwabasystems.asakusa.model.Gender;
 import com.akwabasystems.asakusa.model.ItemPriority;
 import com.akwabasystems.asakusa.model.ItemStatus;
+import com.akwabasystems.asakusa.model.MembershipType;
 import com.akwabasystems.asakusa.model.PhoneNumberType;
 import com.akwabasystems.asakusa.model.Role;
 import com.datastax.oss.driver.api.core.CqlIdentifier;
@@ -104,10 +105,16 @@ public class CassandraConfiguration {
         TypeCodec<ActivityType> activityTypeCodec = ExtraTypeCodecs.enumNamesOf(ActivityType.class);
         
         /** 
-         * Register the PhoneNUmberType codec to encode and decode the "type" field 
+         * Register the PhoneNumberType codec to encode and decode the "type" field 
          * of the PhoneNumber class
          */
         TypeCodec<PhoneNumberType> phoneTypeCodec = ExtraTypeCodecs.enumNamesOf(PhoneNumberType.class);
+        
+        /** 
+         * Register the MembershipType codec to encode and decode the "type" field 
+         * of the Membership class
+         */
+        TypeCodec<MembershipType> membershipTypeCodec = ExtraTypeCodecs.enumNamesOf(MembershipType.class);
 
        /** 
         * Register the codecs to encode and decode the "ItemStatus" 
@@ -132,7 +139,8 @@ public class CassandraConfiguration {
                         statusCodec,
                         priorityCodec,
                         activityTypeCodec,
-                        phoneTypeCodec
+                        phoneTypeCodec,
+                        membershipTypeCodec
                     )
                     .build();
 

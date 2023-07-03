@@ -27,6 +27,8 @@ public class SchemaNames {
     public static final CqlIdentifier TABLE_PHONE_NUMBERS = CqlIdentifier.fromCql("phone_numbers");
     public static final CqlIdentifier TABLE_PHONE_NUMBER_VERIFICATIONS = CqlIdentifier.fromCql("phone_number_verifications");
     public static final CqlIdentifier TABLE_DEVICE_TOKENS = CqlIdentifier.fromCql("device_tokens");
+    public static final CqlIdentifier TABLE_MEMBERSHIP = CqlIdentifier.fromCql("membership");
+    public static final CqlIdentifier TABLE_USER_SESSIONS = CqlIdentifier.fromCql("user_sessions");
     
     public static final CqlIdentifier COLUMN_ID = CqlIdentifier.fromCql("id");
     public static final CqlIdentifier COLUMN_USER_ID = CqlIdentifier.fromCql("user_id");
@@ -93,5 +95,8 @@ public class SchemaNames {
     public static final CqlIdentifier COLUMN_CODE = CqlIdentifier.fromCql("code");
     public static final CqlIdentifier COLUMN_DEVICE_TOKEN = CqlIdentifier.fromCql("device_token");
     public static final CqlIdentifier COLUMN_SETTINGS = CqlIdentifier.fromCql("settings");
-    
+    public static final CqlIdentifier COLUMN_LICENSE_KEY = CqlIdentifier.fromCql("license_key");
+    public static final CqlIdentifier COLUMN_SOURCE = CqlIdentifier.fromCql("source");
+    public static final CqlIdentifier COLUMN_CLIENT = CqlIdentifier.fromCql("client");
+    public static final CqlIdentifier COLUMN_ACTIVE = CqlIdentifier.fromCql("active");
 }

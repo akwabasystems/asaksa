@@ -2,6 +2,7 @@
 package com.akwabasystems.asakusa.repository;
 
 import com.akwabasystems.asakusa.dao.DeviceTokenDao;
+import com.akwabasystems.asakusa.dao.MembershipDao;
 import com.akwabasystems.asakusa.dao.PhoneNumberDao;
 import com.akwabasystems.asakusa.dao.PhoneVerificationDao;
 import com.akwabasystems.asakusa.dao.ProjectActivityDao;
@@ -9,6 +10,7 @@ import com.akwabasystems.asakusa.dao.ProjectDao;
 import com.akwabasystems.asakusa.dao.TaskDao;
 import com.akwabasystems.asakusa.dao.TeamDao;
 import com.akwabasystems.asakusa.dao.UserDao;
+import com.akwabasystems.asakusa.dao.UserSessionDao;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.mapper.MapperBuilder;
 import com.datastax.oss.driver.api.mapper.annotations.DaoFactory;
@@ -45,6 +47,12 @@ public interface RepositoryMapper {
     
     @DaoFactory
     DeviceTokenDao deviceTokenDao();
+    
+    @DaoFactory
+    MembershipDao membershipDao();
+    
+    @DaoFactory
+    UserSessionDao userSessionDao();
     
     static MapperBuilder<RepositoryMapper> builder(CqlSession cqlSession) {
         return new RepositoryMapperBuilder(cqlSession);
