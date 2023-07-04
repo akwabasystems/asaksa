@@ -52,6 +52,7 @@ public class SchemaNames {
     
     public static final CqlIdentifier COLUMN_TITLE = CqlIdentifier.fromCql("title");
     public static final CqlIdentifier COLUMN_DESCRIPTION = CqlIdentifier.fromCql("description");
+    public static final CqlIdentifier COLUMN_CREATED_BY = CqlIdentifier.fromCql("created_by");
     public static final CqlIdentifier COLUMN_CREATED_DATE = CqlIdentifier.fromCql("created_date");
     public static final CqlIdentifier COLUMN_CREATED_AT = CqlIdentifier.fromCql("created_at");
     public static final CqlIdentifier COLUMN_UPDATED_AT = CqlIdentifier.fromCql("updated_at");

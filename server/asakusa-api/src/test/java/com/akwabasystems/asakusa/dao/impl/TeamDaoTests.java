@@ -57,13 +57,16 @@ public class TeamDaoTests extends BaseTestSuite {
     public void testCreateAndRetrieveTeam() throws Exception {
         TeamDao teamDao = mapper.teamDao();
         
+        User user = TestUtils.defaultUser();
         Team team = TestUtils.defaultTeam();
+        team.setCreatedBy(user.getUserId());
         teamDao.create(team);
         
         Team teamById = teamDao.findById(team.getId());
         
         assertThat(teamById).isNotNull();
         assertThat(teamById.getName()).isEqualTo(team.getName());
+        assertThat(teamById.getCreatedBy()).isEqualTo(user.getUserId());
         assertThat(teamById.getCreatedDate()).isNotNull();
         assertThat(teamById.getLastModifiedDate()).isNotNull();
         

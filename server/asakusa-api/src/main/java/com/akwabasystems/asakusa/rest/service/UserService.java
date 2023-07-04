@@ -15,7 +15,6 @@ import com.akwabasystems.asakusa.repository.RepositoryMapper;
 import com.akwabasystems.asakusa.rest.utils.AuthorizationTicket;
 import com.akwabasystems.asakusa.rest.utils.ApplicationError;
 import com.akwabasystems.asakusa.rest.utils.QueryParameter;
-import com.akwabasystems.asakusa.utils.PrintUtils;
 import com.akwabasystems.asakusa.utils.Timeline;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.uuid.Uuids;

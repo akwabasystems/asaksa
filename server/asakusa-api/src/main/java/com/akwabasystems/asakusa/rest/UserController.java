@@ -10,6 +10,7 @@ import com.akwabasystems.asakusa.rest.utils.ApplicationError;
 import com.akwabasystems.asakusa.rest.utils.AuthorizationTicket;
 import com.akwabasystems.asakusa.rest.utils.QueryParameter;
 import com.akwabasystems.asakusa.rest.utils.QueryUtils;
+import com.akwabasystems.asakusa.utils.PrintUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.net.URI;
@@ -50,7 +51,7 @@ public class UserController extends BaseController {
      * @return a JSON object with the details of the newly created user
      * @throws Exception if the request fails
      */
-    @PostMapping("/")
+    @PostMapping(path = { "", "/" })
     public ResponseEntity<?> createAccount(HttpServletRequest request,
                                            HttpServletResponse response,
                                            @RequestBody LinkedHashMap<String,Object> map) 
