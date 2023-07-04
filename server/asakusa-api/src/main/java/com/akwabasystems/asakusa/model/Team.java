@@ -19,6 +19,7 @@ public class Team {
     
     private String name;
     private String description;
+    private String createdBy;
     private String createdDate;
     private String lastModifiedDate;
     
@@ -56,6 +57,14 @@ public class Team {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 
     public String getCreatedDate() {

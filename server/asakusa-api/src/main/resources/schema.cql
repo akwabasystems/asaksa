@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS teams (
     id uuid PRIMARY KEY,
     name text,
     description text,
+    created_by text,
     created_date text,
     last_modified_date text
 );

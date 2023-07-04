@@ -132,6 +132,7 @@ public class AsakusaRepository {
          *   id uuid PRIMARY KEY,
          *   name text,
          *   description text,
+         *   created_by text,
          *   created_date text,
          *   last_modified_date text
          * );
@@ -142,6 +143,7 @@ public class AsakusaRepository {
                     .withPartitionKey(SchemaNames.COLUMN_ID, DataTypes.UUID)
                     .withColumn(SchemaNames.COLUMN_NAME, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_DESCRIPTION, DataTypes.TEXT)
+                    .withColumn(SchemaNames.COLUMN_CREATED_BY, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_CREATED_DATE, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_LAST_MODIFIED_DATE, DataTypes.TEXT)
                     .build());

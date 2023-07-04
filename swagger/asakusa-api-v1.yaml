@@ -1031,6 +1031,11 @@ components:
           type: string
         description:
           type: string
+        created_by:
+          type: string
+        created_date:
+          type: string
+          format: date-time
       required:
         - name
         

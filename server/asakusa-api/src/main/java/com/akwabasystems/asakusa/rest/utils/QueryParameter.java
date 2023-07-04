@@ -20,6 +20,8 @@ public class QueryParameter {
     public static final String LOCALE = "locale";
     public static final String PREFERRED_LANGUAGE = "preferredLanguage";
     
+    public static final String DESCRIPTION = "description";
+    public static final String CREATED_BY = "createdBy";
     public static final String CLIENT = "client";
     
     public static final String TOKEN = "token";
@@ -27,5 +29,7 @@ public class QueryParameter {
     public static final String CONTEXT = "context";
     
     public static final String SETTINGS = "settings";
+    
+    public static final String MEMBER_ID = "memberId";
     
 }
