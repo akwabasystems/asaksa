@@ -31,5 +31,14 @@ public class QueryParameter {
     public static final String SETTINGS = "settings";
     
     public static final String MEMBER_ID = "memberId";
+    public static final String OWNER_ID = "ownerId";
+    
+    public static final String START_DATE = "startDate";
+    public static final String END_DATE = "endDate";
+    public static final String DEADLINE = "deadline";
+    public static final String TIMEZONE = "timezone";
+    public static final String CAPACITY = "capacity";
+    public static final String PRIORITY = "priority";
+    public static final String TAGS = "tags";
     
 }

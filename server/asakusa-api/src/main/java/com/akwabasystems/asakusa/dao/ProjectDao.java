@@ -2,7 +2,6 @@
 package com.akwabasystems.asakusa.dao;
 
 import com.akwabasystems.asakusa.model.Project;
-import com.akwabasystems.asakusa.model.Team;
 import com.datastax.oss.driver.api.core.PagingIterable;
 import com.datastax.oss.driver.api.mapper.annotations.CqlName;
 import com.datastax.oss.driver.api.mapper.annotations.Dao;

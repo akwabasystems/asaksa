@@ -51,7 +51,7 @@ public class UserController extends BaseController {
      * @return a JSON object with the details of the newly created user
      * @throws Exception if the request fails
      */
-    @PostMapping(path = { "", "/" })
+    @PostMapping("")
     public ResponseEntity<?> createAccount(HttpServletRequest request,
                                            HttpServletResponse response,
                                            @RequestBody LinkedHashMap<String,Object> map) 
