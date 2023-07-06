@@ -155,6 +155,30 @@ paths:
         in: path
         required: true
         
+    get:
+      tags:
+        - Teams
+      summary: Retrieve a team
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+
     put:
       tags:
         - Teams
@@ -384,6 +408,30 @@ paths:
         in: path
         required: true
         
+    get:
+      tags:
+        - Projects
+      summary: Retrieve a project
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+
     put:
       tags:
         - Projects
