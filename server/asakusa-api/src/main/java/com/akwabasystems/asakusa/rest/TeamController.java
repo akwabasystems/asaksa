@@ -71,7 +71,7 @@ public class TeamController extends BaseController {
         Team team = teamService.createTeam(authTicket, parameterMap);
         
         if (team != null) {
-            String location = String.format("/api/v3/team/%s", team.getId().toString());
+            String location = String.format("/api/v3/teams/%s", team.getId().toString());
         
             /** Return an HTTP 201 (Created) response with the user details */
             return ResponseEntity.created(new URI(location)).body(team);

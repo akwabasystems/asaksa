@@ -60,7 +60,7 @@ public class ProjectDaoTests extends BaseTestSuite {
         assertThat(projectById.getTeamId()).isEqualTo(team.getId());
         assertThat(projectById.getStatus()).isEqualTo(ItemStatus.TODO);
         assertThat(projectById.getPriority()).isEqualTo(ItemPriority.MEDIUM);
-        assertThat(projectById.getCapacity()).isEqualTo(10);
+        assertThat(projectById.getCapacity() == 8.0).isTrue();
         
         projectDao.delete(project);
         

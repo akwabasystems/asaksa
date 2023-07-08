@@ -32,7 +32,7 @@ public class Project {
     private String startDate;
     private String endDate;
     private String deadline;
-    private int capacity = 10;
+    private double capacity = 8.0;
     private ItemStatus status = ItemStatus.TODO;
     private ItemPriority priority = ItemPriority.MEDIUM;
     private Set<String> tags = new HashSet<>();
@@ -111,11 +111,11 @@ public class Project {
         this.deadline = deadline;
     }
 
-    public int getCapacity() {
+    public double getCapacity() {
         return capacity;
     }
 
-    public void setCapacity(int capacity) {
+    public void setCapacity(double capacity) {
         this.capacity = capacity;
     }
 

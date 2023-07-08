@@ -82,7 +82,7 @@ public class ProjectController extends BaseController {
         Project project = projectService.createProject(authTicket, id, parameterMap);
         
         if (project != null) {
-            String location = String.format("/api/v3/team/%s/projects/%s", 
+            String location = String.format("/api/v3/teams/%s/projects/%s", 
                     id, project.getId().toString());
         
             /** Return an HTTP 201 (Created) response with the user details */
@@ -205,6 +205,7 @@ public class ProjectController extends BaseController {
         QueryUtils.populateMapIfPresent(map, parameterMap, QueryParameter.END_DATE);
         QueryUtils.populateMapIfPresent(map, parameterMap, QueryParameter.DEADLINE);
         QueryUtils.populateMapIfPresent(map, parameterMap, QueryParameter.PRIORITY);
+        QueryUtils.populateMapIfPresent(map, parameterMap, QueryParameter.STATUS);
         QueryUtils.populateMapIfPresent(map, parameterMap, QueryParameter.CAPACITY);
         QueryUtils.populateMapIfPresent(map, parameterMap, QueryParameter.TAGS);
 

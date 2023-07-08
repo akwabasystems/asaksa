@@ -4,6 +4,7 @@ package com.akwabasystems.asakusa.rest.service;
 import com.akwabasystems.asakusa.dao.ProjectDao;
 import com.akwabasystems.asakusa.dao.TeamDao;
 import com.akwabasystems.asakusa.model.ItemPriority;
+import com.akwabasystems.asakusa.model.ItemStatus;
 import com.akwabasystems.asakusa.model.Project;
 import com.akwabasystems.asakusa.model.Team;
 import com.akwabasystems.asakusa.repository.RepositoryMapper;
@@ -77,7 +78,7 @@ public class ProjectService {
         }
         
         if (projectDetails.containsKey(QueryParameter.CAPACITY)) {
-            project.setCapacity((int) projectDetails.get(QueryParameter.CAPACITY));
+            project.setCapacity((double) projectDetails.get(QueryParameter.CAPACITY));
         }
         
         if (projectDetails.containsKey(QueryParameter.PRIORITY)) {
@@ -186,12 +187,17 @@ public class ProjectService {
         }
         
         if (projectDetails.containsKey(QueryParameter.CAPACITY)) {
-            project.setCapacity((int) projectDetails.get(QueryParameter.CAPACITY));
+            project.setCapacity((double) projectDetails.get(QueryParameter.CAPACITY));
         }
         
         if (projectDetails.containsKey(QueryParameter.PRIORITY)) {
             ItemPriority priority = ItemPriority.fromString((String) projectDetails.get(QueryParameter.PRIORITY));
             project.setPriority(priority);
+        }
+        
+        if (projectDetails.containsKey(QueryParameter.STATUS)) {
+            ItemStatus status = ItemStatus.fromString((String) projectDetails.get(QueryParameter.STATUS));
+            project.setStatus(status);
         }
         
         if (projectDetails.containsKey(QueryParameter.START_DATE)) {
