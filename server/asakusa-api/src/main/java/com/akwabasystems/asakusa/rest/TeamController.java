@@ -53,7 +53,7 @@ public class TeamController extends BaseController {
     public ResponseEntity<?> createTeam(HttpServletRequest request,
                                         HttpServletResponse response,
                                         @RequestBody LinkedHashMap<String,Object> map) 
-                                                         throws Exception {
+                                        throws Exception {
         String accessToken = (String) request.getHeader(QueryParameter.ACCESS_TOKEN);
         String userId = (String) QueryUtils.getValueRequired(map, QueryParameter.USER_ID);
 
@@ -73,17 +73,15 @@ public class TeamController extends BaseController {
         if (team != null) {
             String location = String.format("/api/v3/teams/%s", team.getId().toString());
         
-            /** Return an HTTP 201 (Created) response with the user details */
+            /** Return an HTTP 201 (Created) response with the team details */
             return ResponseEntity.created(new URI(location)).body(team);
-            
-        } else {
-            log.severe(String.format("[teamController#createTeam] - Error creating team with name %s", name));
-            
-            ProblemDetail details = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-            details.setTitle(ApplicationError.HTTP_ERROR);
-            details.setInstance(new URI(request.getRequestURI()));
-            return ResponseEntity.of(details).build();
         }
+        
+        log.severe(String.format("[teamController#createTeam] - Error creating team with name %s", name));
+
+        ProblemDetail details = problemDetails(HttpStatus.BAD_REQUEST, 
+                request.getRequestURI(), ApplicationError.HTTP_ERROR);
+        return ResponseEntity.of(details).build();
 
     }
     
@@ -99,12 +97,11 @@ public class TeamController extends BaseController {
     @GetMapping("")
     public ResponseEntity<List<Team>> findAllTeams(HttpServletRequest request,
                                                    HttpServletResponse response) 
-                                                      throws Exception {
+                                                   throws Exception {
         String accessToken = (String) request.getHeader(QueryParameter.ACCESS_TOKEN);
         String userId = (String) request.getParameter(QueryParameter.USER_ID);
         
         List<Team> teams = teamService.findAll(getAuthorizationTicket(userId, accessToken));
-        
         return ResponseEntity.ok(teams);
     }
 
@@ -120,8 +117,8 @@ public class TeamController extends BaseController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<Team> teamById(HttpServletRequest request,
-                                      HttpServletResponse response,
-                                      @PathVariable String id) throws Exception {
+                                         HttpServletResponse response,
+                                         @PathVariable String id) throws Exception {
         String accessToken = (String) request.getHeader(QueryParameter.ACCESS_TOKEN);
         String userId = (String) request.getParameter(QueryParameter.USER_ID);
         
@@ -130,13 +127,12 @@ public class TeamController extends BaseController {
                 UUID.fromString(id));
 
         if (team == null) {
-            ProblemDetail details = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
-            details.setTitle(ApplicationError.TEAM_NOT_FOUND);
-            details.setInstance(new URI(request.getRequestURI()));
+            ProblemDetail details = problemDetails(HttpStatus.NOT_FOUND, 
+                    request.getRequestURI(), ApplicationError.TEAM_NOT_FOUND);
             return ResponseEntity.of(details).build();
-        } else {
-            return ResponseEntity.ok(team);
         }
+        
+        return ResponseEntity.ok(team);
     }
 
 
@@ -151,10 +147,10 @@ public class TeamController extends BaseController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<Team> updateTeam(HttpServletRequest request,
-                                        HttpServletResponse response,
-                                        @PathVariable String id,
-                                        @RequestBody LinkedHashMap<String,Object> map) 
-                                                         throws Exception {
+                                           HttpServletResponse response,
+                                           @PathVariable String id,
+                                           @RequestBody LinkedHashMap<String,Object> map) 
+                                           throws Exception {
         String accessToken = (String) request.getHeader(QueryParameter.ACCESS_TOKEN);
         String userId = (String) QueryUtils.getValueRequired(map, QueryParameter.USER_ID);
         
@@ -178,11 +174,11 @@ public class TeamController extends BaseController {
     
     
     /**
-     * Handles a request to retrieve the members for the specified team
+     * Handles a request to retrieve the members of the specified team
      * 
      * @param request       the incoming request
      * @param response      the outgoing response
-     * @param id            the ID of the team for whom to retrieve the members
+     * @param id            the ID of the team for which to retrieve the members
      * @return the list of members for the specified team
      * @throws Exception if the request fails
      */
@@ -190,7 +186,7 @@ public class TeamController extends BaseController {
     public ResponseEntity<List<String>> teamMembers(HttpServletRequest request,
                                                     HttpServletResponse response,
                                                     @PathVariable String id) 
-                                                      throws Exception {
+                                                    throws Exception {
         String accessToken = (String) request.getHeader(QueryParameter.ACCESS_TOKEN);
         String userId = (String) request.getParameter(QueryParameter.USER_ID);
         
@@ -207,7 +203,7 @@ public class TeamController extends BaseController {
      * 
      * @param request       the incoming request
      * @param response      the outgoing response
-     * @param id            the ID of the team for whom to retrieve the members
+     * @param id            the ID of the team to which to add the member
      * @param map           the request body
      * @return the updated members list for the specified team
      * @throws Exception if the request fails
@@ -217,7 +213,7 @@ public class TeamController extends BaseController {
                                                       HttpServletResponse response,
                                                       @PathVariable String id,
                                                       @RequestBody LinkedHashMap<String,Object> map) 
-                                                         throws Exception {
+                                                      throws Exception {
         String accessToken = (String) request.getHeader(QueryParameter.ACCESS_TOKEN);
         String userId = (String) QueryUtils.getValueRequired(map, QueryParameter.USER_ID);
         String memberId = (String) QueryUtils.getValueRequired(map, QueryParameter.MEMBER_ID);

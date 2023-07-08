@@ -46,15 +46,15 @@ public class UserController extends BaseController {
      * 
      * @param request       the incoming request
      * @param response      the outgoing response
-     * @param map           an object that contains the query parameters
-     * @return a JSON object with the details of the newly created user
+     * @param map           the request body
+     * @return the details of the newly created user
      * @throws Exception if the request fails
      */
     @PostMapping("")
     public ResponseEntity<?> createAccount(HttpServletRequest request,
                                            HttpServletResponse response,
                                            @RequestBody LinkedHashMap<String,Object> map) 
-                                                         throws Exception {
+                                           throws Exception {
         String appId = (String) request.getHeader(QueryParameter.ACCESS_TOKEN);
         
         Map<String,Object> parameterMap = new LinkedHashMap<>();
@@ -94,44 +94,42 @@ public class UserController extends BaseController {
         
             /** Return an HTTP 201 (Created) response with the user details */
             return ResponseEntity.created(new URI(userInfoURI)).body(userResponse);
-            
-        } else {
-            log.severe(String.format("[UserController#createAccount] - Error creating account for user %s", userId));
-            
-            ProblemDetail details = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-            details.setTitle(ApplicationError.HTTP_ERROR);
-            details.setInstance(new URI(request.getRequestURI()));
-            return ResponseEntity.of(details).build();
         }
+        
+        log.severe(String.format("[UserController#createAccount] - Error creating account for user %s", userId));
+
+        ProblemDetail details = problemDetails(HttpStatus.BAD_REQUEST, 
+                request.getRequestURI(), ApplicationError.HTTP_ERROR);
+        return ResponseEntity.of(details).build();
 
     }
     
     
     /**
-     * Handles a request to retrieve the details for a given user
+     * Handles a request to find a user by ID
      * 
      * @param request       the incoming request
      * @param response      the outgoing response
-     * @param id            the ID of the user for whom to retrieve the details
-     * @return a JSON object with the user's details
+     * @param id            the ID of the user to find
+     * @return the user with the specified ID
      * @throws Exception if the request fails
      */
     @GetMapping("/{id}")
-    public ResponseEntity<?> userInfo(HttpServletRequest request,
-                                                 HttpServletResponse response,
-                                                 @PathVariable String id) 
-                                                      throws Exception {
+    public ResponseEntity<?> userById(HttpServletRequest request,
+                                      HttpServletResponse response,
+                                      @PathVariable String id) 
+                                      throws Exception {
         String accessToken = (String) request.getHeader(QueryParameter.ACCESS_TOKEN);
         User user = userService.findUserById(getAuthorizationTicket(id, accessToken));
         
         if (user == null) {
-            ProblemDetail details = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
-            details.setTitle(ApplicationError.USER_NOT_FOUND);
-            details.setInstance(new URI(request.getRequestURI()));
+            ProblemDetail details = problemDetails(HttpStatus.NOT_FOUND, 
+                    request.getRequestURI(), ApplicationError.USER_NOT_FOUND);
             return ResponseEntity.of(details).build();
-        } else {
-            return ResponseEntity.ok(UserResponse.fromUser(user));
         }
+        
+        return ResponseEntity.ok(UserResponse.fromUser(user));
+ 
     }
     
     
@@ -140,8 +138,8 @@ public class UserController extends BaseController {
      * 
      * @param request       the incoming request
      * @param response      the outgoing response
-     * @param map           an object that contains the query parameters
-     * @return a JSON object with the updated user details
+     * @param map           the request body
+     * @return the updated user details
      * @throws Exception if the request fails
      */
     @PutMapping("/{id}")
@@ -170,15 +168,14 @@ public class UserController extends BaseController {
             User updatedUser = userService.findUserById(authTicket);
             return ResponseEntity.ok(UserResponse.fromUser(updatedUser));
             
-        } else {
-            log.severe(String.format("[UserController#updateUser] - Error updating account for user %s", id));
-            
-            ProblemDetail details = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-            details.setTitle(ApplicationError.HTTP_ERROR);
-            details.setInstance(new URI(request.getRequestURI()));
-            return ResponseEntity.of(details).build();
         }
         
+        log.severe(String.format("[UserController#updateUser] - Error updating account for user %s", id));
+
+        ProblemDetail details = problemDetails(HttpStatus.BAD_REQUEST, 
+                request.getRequestURI(), ApplicationError.HTTP_ERROR);
+        return ResponseEntity.of(details).build();
+ 
     }
     
     
@@ -188,7 +185,7 @@ public class UserController extends BaseController {
      * @param request       the incoming request
      * @param response      the outgoing response
      * @param id            the ID of the user for whom to retrieve the preferences
-     * @return a JSON object with the user's preferences
+     * @return the preferences for the specified user
      * @throws Exception if the request fails
      */
     @GetMapping("/{id}/preferences")
@@ -200,16 +197,15 @@ public class UserController extends BaseController {
         User user = userService.findUserById(getAuthorizationTicket(id, accessToken));
         
         if (user == null) {
-            ProblemDetail details = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
-            details.setTitle(ApplicationError.USER_NOT_FOUND);
-            details.setInstance(new URI(request.getRequestURI()));
+            ProblemDetail details = problemDetails(HttpStatus.NOT_FOUND, 
+                    request.getRequestURI(), ApplicationError.USER_NOT_FOUND);
             return ResponseEntity.of(details).build();
-        } else {
-            UserPreferences preferences = userService.getUserPreferences(user);
-            return ResponseEntity.ok()
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .body(preferences.getSettings().toString());
         }
+        
+        UserPreferences preferences = userService.getUserPreferences(user);
+        return ResponseEntity.ok()
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .body(preferences.getSettings().toString());
     }
     
     
@@ -236,9 +232,8 @@ public class UserController extends BaseController {
         User user = userService.findUserById(authTicket);
         
         if (user == null) {
-            ProblemDetail details = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
-            details.setTitle(ApplicationError.USER_NOT_FOUND);
-            details.setInstance(new URI(request.getRequestURI()));
+            ProblemDetail details = problemDetails(HttpStatus.NOT_FOUND, 
+                    request.getRequestURI(), ApplicationError.USER_NOT_FOUND);
             return ResponseEntity.of(details).build();
         }
         

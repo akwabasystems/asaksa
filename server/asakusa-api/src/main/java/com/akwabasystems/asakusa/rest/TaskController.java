@@ -7,7 +7,6 @@ import com.akwabasystems.asakusa.rest.utils.ApplicationError;
 import com.akwabasystems.asakusa.rest.utils.AuthorizationTicket;
 import com.akwabasystems.asakusa.rest.utils.QueryParameter;
 import com.akwabasystems.asakusa.rest.utils.QueryUtils;
-import com.akwabasystems.asakusa.utils.PrintUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.net.URI;
@@ -91,15 +90,14 @@ public class TaskController extends BaseController {
             /** Return an HTTP 201 (Created) response with the task details */
             return ResponseEntity.created(new URI(location)).body(task);
             
-        } else {
-            log.severe(String.format("[taskController#createTask] - Error creating task - Title: %s - Project: %s%n",
-                    title, id));
-            
-            ProblemDetail details = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-            details.setTitle(ApplicationError.HTTP_ERROR);
-            details.setInstance(new URI(request.getRequestURI()));
-            return ResponseEntity.of(details).build();
         }
+        
+        log.severe(String.format("[taskController#createTask] - Error creating task - Title: %s - Project: %s%n",
+                title, id));
+
+        ProblemDetail details = problemDetails(HttpStatus.BAD_REQUEST, 
+                request.getRequestURI(), ApplicationError.HTTP_ERROR);
+        return ResponseEntity.of(details).build();
         
     }
 
@@ -109,7 +107,7 @@ public class TaskController extends BaseController {
      * 
      * @param request       the incoming request
      * @param response      the outgoing response
-     * @param id            the ID of the project for whom to retrieve the tasks
+     * @param id            the ID of the project for which to retrieve the tasks
      * @return the list of tasks for the specified project
      * @throws Exception if the request fails
      */
@@ -156,13 +154,13 @@ public class TaskController extends BaseController {
         );
         
         if (task == null) {
-            ProblemDetail details = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
-            details.setTitle(ApplicationError.TASK_NOT_FOUND);
-            details.setInstance(new URI(request.getRequestURI()));
+            ProblemDetail details = problemDetails(HttpStatus.NOT_FOUND, 
+                    request.getRequestURI(), ApplicationError.TASK_NOT_FOUND);
             return ResponseEntity.of(details).build();
-        } else {
-            return ResponseEntity.ok(task);
         }
+        
+        return ResponseEntity.ok(task);
+
     }
     
     

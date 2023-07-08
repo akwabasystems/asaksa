@@ -85,18 +85,17 @@ public class ProjectController extends BaseController {
             String location = String.format("/api/v3/teams/%s/projects/%s", 
                     id, project.getId().toString());
         
-            /** Return an HTTP 201 (Created) response with the user details */
+            /** Return an HTTP 201 (Created) response with the project details */
             return ResponseEntity.created(new URI(location)).body(project);
             
-        } else {
-            log.severe(String.format("[projectController#createProject] - Error creating project - Name: %s - Team: %s%n",
-                    name, id));
-            
-            ProblemDetail details = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-            details.setTitle(ApplicationError.HTTP_ERROR);
-            details.setInstance(new URI(request.getRequestURI()));
-            return ResponseEntity.of(details).build();
         }
+        
+        log.severe(String.format("[projectController#createProject] - Error creating project - Name: %s - Team: %s%n",
+                name, id));
+
+        ProblemDetail details = problemDetails(HttpStatus.BAD_REQUEST, 
+                request.getRequestURI(), ApplicationError.HTTP_ERROR);
+        return ResponseEntity.of(details).build();
         
     }
 
@@ -106,7 +105,7 @@ public class ProjectController extends BaseController {
      * 
      * @param request       the incoming request
      * @param response      the outgoing response
-     * @param id            the ID of the team for whom to retrieve the projects
+     * @param id            the ID of the team for which to retrieve the projects
      * @return the list of projects for the specified team
      * @throws Exception if the request fails
      */
@@ -127,9 +126,8 @@ public class ProjectController extends BaseController {
     }
     
 
-
     /**
-     * Handles a request to retrieve the details of a project
+     * Handles a request to find a project by ID
      * 
      * @param request       the incoming request
      * @param response      the outgoing response
@@ -154,18 +152,18 @@ public class ProjectController extends BaseController {
         );
         
         if (project == null) {
-            ProblemDetail details = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
-            details.setTitle(ApplicationError.PROJECT_NOT_FOUND);
-            details.setInstance(new URI(request.getRequestURI()));
+            ProblemDetail details = problemDetails(HttpStatus.NOT_FOUND, 
+                    request.getRequestURI(), ApplicationError.PROJECT_NOT_FOUND);
             return ResponseEntity.of(details).build();
-        } else {
-            return ResponseEntity.ok(project);
         }
+        
+        return ResponseEntity.ok(project);
+ 
     }
     
     
     /**
-     * Handles a request to update a new project
+     * Handles a request to update a project
      * 
      * @param request       the incoming request
      * @param response      the outgoing response
