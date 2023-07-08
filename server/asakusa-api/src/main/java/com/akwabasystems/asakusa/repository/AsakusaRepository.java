@@ -175,7 +175,7 @@ public class AsakusaRepository {
          *   start_date text,
          *   deadline text,
          *   end_date text,
-         *   capacity double,
+         *   capacity int,
          *   status text,
          *   priority text,
          *   tags set<text>,
@@ -195,7 +195,7 @@ public class AsakusaRepository {
                     .withColumn(SchemaNames.COLUMN_START_DATE, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_DEADLINE, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_END_DATE, DataTypes.TEXT)
-                    .withColumn(SchemaNames.COLUMN_CAPACITY, DataTypes.DOUBLE)
+                    .withColumn(SchemaNames.COLUMN_CAPACITY, DataTypes.INT)
                     .withColumn(SchemaNames.COLUMN_STATUS, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_PRIORITY, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_TAGS, DataTypes.setOf(DataTypes.TEXT))

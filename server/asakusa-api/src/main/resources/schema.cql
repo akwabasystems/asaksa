@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS projects (
     start_date text,
     deadline text,
     end_date text,
-    capacity double,
+    capacity int,
     status text,
     priority text,
     tags set<text>,

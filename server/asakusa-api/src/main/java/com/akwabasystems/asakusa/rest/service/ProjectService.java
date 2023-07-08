@@ -78,7 +78,7 @@ public class ProjectService {
         }
         
         if (projectDetails.containsKey(QueryParameter.CAPACITY)) {
-            project.setCapacity((double) projectDetails.get(QueryParameter.CAPACITY));
+            project.setCapacity((int) projectDetails.get(QueryParameter.CAPACITY));
         }
         
         if (projectDetails.containsKey(QueryParameter.PRIORITY)) {
@@ -187,7 +187,7 @@ public class ProjectService {
         }
         
         if (projectDetails.containsKey(QueryParameter.CAPACITY)) {
-            project.setCapacity((double) projectDetails.get(QueryParameter.CAPACITY));
+            project.setCapacity((int) projectDetails.get(QueryParameter.CAPACITY));
         }
         
         if (projectDetails.containsKey(QueryParameter.PRIORITY)) {
