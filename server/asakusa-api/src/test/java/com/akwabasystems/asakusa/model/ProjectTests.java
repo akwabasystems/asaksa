@@ -22,7 +22,7 @@ public class ProjectTests extends BaseTestSuite {
         assertThat(project.getName()).isEqualTo(projectName);
         assertThat(project.getStatus()).isEqualTo(ItemStatus.TODO);
         assertThat(project.getPriority()).isEqualTo(ItemPriority.MEDIUM);
-        assertThat(project.getCapacity()).isEqualTo(10);
+        assertThat(project.getCapacity() == 40).isTrue();
         assertThat(project.getStartDate()).isNull();
         assertThat(project.getEndDate()).isNull();
         assertThat(project.getDeadline()).isNull();

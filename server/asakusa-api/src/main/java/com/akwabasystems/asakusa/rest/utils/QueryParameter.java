@@ -20,9 +20,13 @@ public class QueryParameter {
     public static final String LOCALE = "locale";
     public static final String PREFERRED_LANGUAGE = "preferredLanguage";
     
+    public static final String TITLE = "title";
     public static final String DESCRIPTION = "description";
     public static final String CREATED_BY = "createdBy";
     public static final String CLIENT = "client";
+    public static final String ASSIGNEE_ID = "assigneeId";
+    public static final String DEPENDS_ON = "dependsOn";
+    public static final String ESTIMATED_DURATION = "estimatedDuration";
     
     public static final String TOKEN = "token";
     public static final String ACCESS_TOKEN = "X-AKWABA-TOKEN";
@@ -32,6 +36,8 @@ public class QueryParameter {
     
     public static final String MEMBER_ID = "memberId";
     public static final String OWNER_ID = "ownerId";
+    public static final String TEAM_ID = "teamId";
+    public static final String PROJECT_ID = "projectId";
     
     public static final String START_DATE = "startDate";
     public static final String END_DATE = "endDate";
@@ -39,6 +45,7 @@ public class QueryParameter {
     public static final String TIMEZONE = "timezone";
     public static final String CAPACITY = "capacity";
     public static final String PRIORITY = "priority";
+    public static final String STATUS = "status";
     public static final String TAGS = "tags";
     
 }

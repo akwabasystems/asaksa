@@ -32,7 +32,7 @@ public class Project {
     private String startDate;
     private String endDate;
     private String deadline;
-    private int capacity = 10;
+    private int capacity = 40;
     private ItemStatus status = ItemStatus.TODO;
     private ItemPriority priority = ItemPriority.MEDIUM;
     private Set<String> tags = new HashSet<>();

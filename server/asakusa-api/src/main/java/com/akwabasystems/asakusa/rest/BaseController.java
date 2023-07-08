@@ -1,8 +1,12 @@
 
 package com.akwabasystems.asakusa.rest;
 
+import com.akwabasystems.asakusa.rest.utils.ApplicationError;
 import com.akwabasystems.asakusa.rest.utils.AuthorizationTicket;
+import jakarta.servlet.http.HttpServletRequest;
+import java.net.URI;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -59,6 +63,26 @@ public abstract class BaseController {
      */
     protected boolean authorizationRequired() {
         return false;
+    }
+    
+    
+    /**
+     * Returns the request problem with the specified details
+     * 
+     * @param status    the HTTP status of the problem
+     * @param uri       the request URI    
+     * @param title     the title of the problem
+     * @return the request problem with the specified details
+     * @throws Exception if the problem cannot be generated
+     */
+    protected ProblemDetail problemDetails(HttpStatus status,
+                                           String uri,
+                                           String title) throws Exception {
+        ProblemDetail details = ProblemDetail.forStatus(status);
+        details.setTitle(title);
+        details.setInstance(new URI(uri));
+        
+        return details;
     }
     
     
