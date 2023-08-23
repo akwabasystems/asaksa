@@ -2,8 +2,10 @@
 package com.akwabasystems.asakusa.model;
 
 import com.akwabasystems.asakusa.BaseTestSuite;
+import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
+import org.springframework.util.DigestUtils;
 
 
 public class UserCredentialsTests extends BaseTestSuite {
@@ -45,7 +47,13 @@ public class UserCredentialsTests extends BaseTestSuite {
         otherCredentials.setPassword(credentials.getPassword());
         
         assertThat(otherCredentials.hashCode() == credentials.hashCode()).isTrue();
-
     }
+    
+    @Test
+    public void testAuthChallengeGeneration() {
+        String nonce = DigestUtils.md5DigestAsHex(UUID.randomUUID().toString().getBytes());
+        assertThat(nonce).isNotNull();
+    }
+    
     
 }

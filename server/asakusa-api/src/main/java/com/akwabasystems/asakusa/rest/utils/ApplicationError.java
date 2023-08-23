@@ -16,6 +16,7 @@ public class ApplicationError {
     public static final String TASK_NOT_FOUND = "error.taskNotFound";
     
     public static final String UNAUTHORIZED_ACCESS = "error.unauthorizedAccess";
+    public static final String INVALID_CREDENTIALS = "error.invalidCredentials";
     public static final String HTTP_ERROR = "error.httpError";
     
 }
