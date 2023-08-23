@@ -30,7 +30,9 @@ public class QueryParameter {
     
     public static final String TOKEN = "token";
     public static final String ACCESS_TOKEN = "X-AKWABA-TOKEN";
+    public static final String AUTH_CONTEXT = "X-AKWABA-CONTEXT";
     public static final String CONTEXT = "context";
+    public static final String ORIGIN = "origin";
     
     public static final String SETTINGS = "settings";
     

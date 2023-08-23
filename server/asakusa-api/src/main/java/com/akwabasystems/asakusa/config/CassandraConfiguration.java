@@ -24,9 +24,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.cassandra.repository.config.EnableCassandraRepositories;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.SecurityFilterChain;
 
 
 @Configuration
+@EnableWebSecurity
 @EnableCassandraRepositories(basePackages = {"com.akwabasystems.asakusa"})
 public class CassandraConfiguration {
 
@@ -62,6 +66,7 @@ public class CassandraConfiguration {
         this.localDataCenterName = localDataCenterName;
         this.keyspace = keyspace;
     }
+    
     
     @Bean
     public CqlIdentifier keyspaceName() {
@@ -152,6 +157,16 @@ public class CassandraConfiguration {
         }
 
         return session;
+    }
+    
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests((authorize) -> authorize.anyRequest().permitAll());
+        http.csrf().disable();
+        http.cors().disable();
+        http.headers().frameOptions().disable();
+        
+        return http.build();
     }
     
     public String getCassandraHost() {

@@ -1,12 +1,9 @@
 
 package com.akwabasystems.asakusa.rest;
 
-import com.akwabasystems.asakusa.rest.utils.ApplicationError;
 import com.akwabasystems.asakusa.rest.utils.AuthorizationTicket;
-import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
