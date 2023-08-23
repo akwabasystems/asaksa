@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/api/v3/auth")
+@RequestMapping("/api/v1/auth")
 @Log
 public class AuthController extends BaseController {
 

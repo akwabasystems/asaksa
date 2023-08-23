@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/api/v3/projects")
+@RequestMapping("/api/v1/projects")
 @Log
 public class TaskController extends BaseController {
 
