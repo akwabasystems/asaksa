@@ -31,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/api/v3/teams")
+@RequestMapping("/api/v1/teams")
 @Log
 public class ProjectController extends BaseController {
 

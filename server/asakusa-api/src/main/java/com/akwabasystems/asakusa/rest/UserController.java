@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/api/v3/users")
+@RequestMapping("/api/v1/users")
 @Log
 public class UserController extends BaseController {
 
