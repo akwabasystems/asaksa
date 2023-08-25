@@ -1,7 +1,10 @@
 
 package com.akwabasystems.asakusa.rest.service;
 
+import com.akwabasystems.asakusa.dao.PhoneVerificationDao;
 import com.akwabasystems.asakusa.dao.UserDao;
+import com.akwabasystems.asakusa.model.ItemStatus;
+import com.akwabasystems.asakusa.model.PhoneNumberVerification;
 import com.akwabasystems.asakusa.model.User;
 import com.akwabasystems.asakusa.model.UserCredentials;
 import com.akwabasystems.asakusa.repository.RepositoryMapper;
@@ -10,9 +13,13 @@ import com.akwabasystems.asakusa.rest.utils.AuthorizationTicket;
 import com.akwabasystems.asakusa.rest.utils.LoginResponse;
 import com.akwabasystems.asakusa.rest.utils.UserResponse;
 import com.akwabasystems.asakusa.utils.PasswordUtils;
+import com.akwabasystems.asakusa.utils.PrintUtils;
+import com.akwabasystems.asakusa.utils.Timeline;
 import com.datastax.oss.driver.api.core.CqlSession;
 import jakarta.annotation.PostConstruct;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import lombok.extern.java.Log;
@@ -37,6 +44,9 @@ public class AuthService {
     
     @Autowired
     private CqlSession cqlSession;
+    
+    @Autowired
+    private SMSService smsService;
     
     private RepositoryMapper mapper;
     private String nonce;
@@ -132,6 +142,134 @@ public class AuthService {
         
         UserResponse userInfo = UserResponse.fromUser(user);
         return new LoginResponse(userInfo, new HashMap<String, Object>(), new HashMap<String,Object>());
+        
+    }
+    
+    
+    /**
+     * Sends a verification code to the specified phone number
+     * 
+     * @param phoneNumber   the phone number to send the verification code to
+     * @param context       an object that contains the request context
+     * @param language      the user's preferred language
+     * @return the phone verification details
+     * @throws Exception if the operation fails
+     */
+    public PhoneNumberVerification sendPhoneNumberVerificationCode(String phoneNumber, 
+                                                                   String context,
+                                                                   String language) 
+        throws Exception {
+        
+        /**
+         * Step 1: Extract the contents of the verification context. This contents
+         * is formatted as follows:
+         *  appId:appKey:realm
+         */
+        String[] parts = context.split(":");
+        
+        if (parts.length != 3) {
+            throw new Exception(ApplicationError.INVALID_PARAMETERS);
+        }
+        
+        String clientAppId = parts[0];
+        String clientAppKey = parts[1];
+        String clientRealm = parts[2];
+        Locale preferredLocale = new Locale(language);
+
+        /** 
+         * Step 2: Check that the context has the correct parameters.
+         * To do this, create a concatenated string of those parameters and 
+         * compare it with the expected values.
+         */
+        String expectedContext = String.format("%s:%s:%s", 
+                appId, appKey, appRealm);
+        String receivedContext = String.format("%s:%s:%s", 
+            clientAppId, clientAppKey,clientRealm);
+        boolean isCorrectContext = expectedContext.equals(receivedContext);
+        
+        if (!isCorrectContext) {
+            throw new Exception(ApplicationError.INVALID_CREDENTIALS);
+        }
+        
+        /**
+         * Step 3: Generate the code for the given phone number, store it, and
+         * send an SMS notification to the device.  
+         */
+        PhoneVerificationDao phoneVerificationDao = mapper.phoneVerificationDao();
+        
+        PhoneNumberVerification phoneVerification = new PhoneNumberVerification(
+                phoneNumber, smsService.generateSMSCode(6), UUID.randomUUID());
+        phoneVerificationDao.addVerificationCode(phoneVerification);
+        
+        String body = smsService.generateBodyForPhoneVerificationCode(
+                preferredLocale, phoneVerification.getCode());
+        smsService.sendMessageToPhone(phoneNumber, body);
+        
+        System.out.println(PrintUtils.DASHES);
+        System.out.println(body);
+        System.out.println(PrintUtils.DASHES);
+        
+        return phoneVerification;
+        
+    }
+    
+    
+    /**
+     * Verifies the given phone verification code
+     * 
+     * @param phoneNumber   the phone number for which to verify the code
+     * @param code          the code to verify
+     * @param context       an object that contains the request context
+     * @return the code verification status
+     * @throws Exception if the operation fails
+     */
+    public Map<String,Object> verifyPhoneCode(String phoneNumber, 
+                                              String code,
+                                              String context) throws Exception {
+        
+        /**
+         * Step 1: Extract the contents of the verification context. This contents
+         * is formatted as follows:
+         *  appId:appKey:realm
+         */
+        String[] parts = context.split(":");
+        
+        if (parts.length != 3) {
+            throw new Exception(ApplicationError.INVALID_PARAMETERS);
+        }
+        
+        String clientAppId = parts[0];
+        String clientAppKey = parts[1];
+        String clientRealm = parts[2];
+
+        String expectedContext = String.format("%s:%s:%s", 
+                appId, appKey, appRealm);
+        String receivedContext = String.format("%s:%s:%s", 
+            clientAppId, clientAppKey,clientRealm);
+        boolean isCorrectContext = expectedContext.equals(receivedContext);
+        
+        if (!isCorrectContext) {
+            throw new Exception(ApplicationError.INVALID_CREDENTIALS);
+        }
+        
+        PhoneVerificationDao phoneVerificationDao = mapper.phoneVerificationDao();
+        PhoneNumberVerification phoneVerification = phoneVerificationDao.findByPhoneNumber(phoneNumber);
+        
+        if (phoneVerification == null) {
+            throw new Exception(ApplicationError.INVALID_PARAMETERS);
+        }
+        
+        ZonedDateTime currentTimeUTC = ZonedDateTime.now(Timeline.timezoneUTC());
+        ZonedDateTime expirationTimeUTC = Timeline.fromUTCFormat(phoneVerification.getExpirationDate());
+        boolean hasExpired = currentTimeUTC.isAfter(expirationTimeUTC);
+        boolean isVerified = hasExpired ? false : phoneVerification.getCode().equals(code);
+        
+        Map<String,Object> status = new HashMap<>();
+        status.put("activeStatus", hasExpired ? ItemStatus.EXPIRED.toString() : 
+                ItemStatus.ACTIVE.toString());
+        status.put("verified", isVerified);
+        
+        return status;
         
     }
     

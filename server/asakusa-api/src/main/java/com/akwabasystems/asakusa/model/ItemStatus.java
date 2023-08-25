@@ -26,7 +26,13 @@ public enum ItemStatus {
     
     ACTIVE,
 
-    INACTIVE;
+    VALID,
+    
+    INVALID,
+    
+    INACTIVE,
+    
+    EXPIRED;
 
     @Override
     public String toString() {
