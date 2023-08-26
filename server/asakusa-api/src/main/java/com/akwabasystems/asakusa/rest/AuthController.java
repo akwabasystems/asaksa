@@ -1,6 +1,7 @@
 
 package com.akwabasystems.asakusa.rest;
 
+import com.akwabasystems.asakusa.model.PhoneNumberVerification;
 import com.akwabasystems.asakusa.rest.service.AuthService;
 import com.akwabasystems.asakusa.rest.utils.LoginResponse;
 import com.akwabasystems.asakusa.rest.utils.QueryParameter;
@@ -65,6 +66,55 @@ public class AuthController extends BaseController {
 
         LoginResponse loginInfo = authService.login(getAuthorizationTicket(userId), context, client);
         return ResponseEntity.ok(loginInfo);
+
+    }
+    
+    
+    /**
+     * Handles a request to send a verification code to a phone number
+     * 
+     * @param request       the incoming request
+     * @param response      the outgoing response
+     * @param map           the request body
+     * @return the number verification details
+     * @throws Exception if the request fails
+     */
+    @PostMapping("/phones/number-verification-code")
+    public ResponseEntity<PhoneNumberVerification> sendPhoneVerificationCode(HttpServletRequest request,
+                                                       HttpServletResponse response,
+                                                       @RequestBody LinkedHashMap<String,Object> map) 
+                                                       throws Exception {
+        String context = (String) request.getHeader(QueryParameter.AUTH_CONTEXT); 
+        String phoneNumber = (String) QueryUtils.getValueRequired(map, QueryParameter.PHONE_NUMBER);
+        String language = (String) QueryUtils.getValueWithDefault(map, QueryParameter.LOCALE, "en");
+        
+        PhoneNumberVerification verificationDetails = authService.sendPhoneNumberVerificationCode(
+                phoneNumber, context, language);
+        return ResponseEntity.ok(verificationDetails);
+
+    }
+    
+    
+    /**
+     * Handles a request to verify a phone code
+     * 
+     * @param request       the incoming request
+     * @param response      the outgoing response
+     * @param map           the request body
+     * @return the number verification details
+     * @throws Exception if the request fails
+     */
+    @PostMapping("/phones/code-verification")
+    public ResponseEntity<Map<String,Object>> verifyCode(HttpServletRequest request,
+                                                         HttpServletResponse response,
+                                                         @RequestBody LinkedHashMap<String,Object> map) 
+                                                         throws Exception {
+        String context = (String) request.getHeader(QueryParameter.AUTH_CONTEXT); 
+        String phoneNumber = (String) QueryUtils.getValueRequired(map, QueryParameter.PHONE_NUMBER);
+        String code = (String) QueryUtils.getValueRequired(map, QueryParameter.CODE);
+        
+        Map<String,Object> verificationStatus = authService.verifyPhoneCode(phoneNumber, code, context);
+        return ResponseEntity.ok(verificationStatus);
 
     }
     

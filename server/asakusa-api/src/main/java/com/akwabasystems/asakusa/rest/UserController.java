@@ -1,15 +1,16 @@
 
 package com.akwabasystems.asakusa.rest;
 
-import com.akwabasystems.asakusa.model.Gender;
 import com.akwabasystems.asakusa.model.User;
 import com.akwabasystems.asakusa.model.UserPreferences;
 import com.akwabasystems.asakusa.rest.utils.UserResponse;
 import com.akwabasystems.asakusa.rest.service.UserService;
 import com.akwabasystems.asakusa.rest.utils.ApplicationError;
 import com.akwabasystems.asakusa.rest.utils.AuthorizationTicket;
+import com.akwabasystems.asakusa.rest.utils.LoginResponse;
 import com.akwabasystems.asakusa.rest.utils.QueryParameter;
 import com.akwabasystems.asakusa.rest.utils.QueryUtils;
+import com.akwabasystems.asakusa.utils.PrintUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.net.URI;
@@ -55,7 +56,10 @@ public class UserController extends BaseController {
                                            HttpServletResponse response,
                                            @RequestBody LinkedHashMap<String,Object> map) 
                                            throws Exception {
-        String appId = (String) request.getHeader(QueryParameter.ACCESS_TOKEN);
+        String context = (String) request.getHeader(QueryParameter.AUTH_CONTEXT);
+        System.out.println(PrintUtils.DASHES);
+        System.out.printf("COMTEXT: %s\n", context);
+        System.out.println(PrintUtils.DASHES);
         
         Map<String,Object> parameterMap = new LinkedHashMap<>();
         
@@ -82,18 +86,17 @@ public class UserController extends BaseController {
          * For security purposes when creating an account, the "appId" is substituted for the "userId" in the
          * "accessToken" header
          */
-        boolean created = userService.createAccount(getAuthorizationTicket(appId), parameterMap);
+        User user = userService.createAccount(parameterMap, context);
         
-        if (created) {
+        if (user != null) {
             String userInfoURI = String.format("/api/v3/users/%s", userId);
-            UserResponse userResponse = new UserResponse(userId, firstName, lastName);
-            userResponse.setEmail(email);
-            userResponse.setUsername(userId);
-            userResponse.setGender(Gender.fromString(gender));
-            userResponse.setLocale(locale);
+    
+            UserResponse userInfo = UserResponse.fromUser(user);
+            LoginResponse responseBody = new LoginResponse(userInfo, 
+                    new HashMap<String, Object>(), new HashMap<String,Object>());
         
             /** Return an HTTP 201 (Created) response with the user details */
-            return ResponseEntity.created(new URI(userInfoURI)).body(userResponse);
+            return ResponseEntity.created(new URI(userInfoURI)).body(responseBody);
         }
         
         log.severe(String.format("[UserController#createAccount] - Error creating account for user %s", userId));

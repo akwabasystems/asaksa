@@ -29,6 +29,7 @@ import java.util.UUID;
 import lombok.extern.java.Log;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 
@@ -36,6 +37,15 @@ import org.springframework.stereotype.Service;
 @Log
 public class UserService {
 
+    @Value("${security.akwaba.app-id}")
+    protected String appId;
+    
+    @Value("${security.akwaba.app-secret}")
+    protected String appKey;
+    
+    @Value("${security.akwaba.realm}")
+    protected String appRealm;
+    
     @Autowired
     private CqlSession cqlSession;
     
@@ -52,13 +62,19 @@ public class UserService {
     /**
      * Creates a user account
      * 
-     * @param authorizationTicket       the ticket used to authorize the request
-     * @param accountDetails            an object with the details of the account to create
+     * @param accountDetails    an object with the details of the account to create
+     * @param context           an object that contains the request context
      * @return true if the user account is created
      * @throws Exception if the request fails
      */
-    public boolean createAccount(AuthorizationTicket authorizationTicket,
-                                 Map<String,Object> accountDetails) throws Exception {
+    public User createAccount(Map<String,Object> accountDetails, String context) 
+            throws Exception {
+        boolean isValidContext = verifyAuthContext(context);
+        
+        if (!isValidContext) {
+            throw new Exception(ApplicationError.INVALID_CREDENTIALS);
+        }
+        
         UserDao userDao = mapper.userDao();
         
         String userId = (String) accountDetails.get(QueryParameter.USER_ID);
@@ -117,10 +133,41 @@ public class UserService {
         /** Add the default membership details for the user */
         addMembershipForUser(user);
         
-        return true;
+        return user;
     }
     
 
+    private boolean verifyAuthContext(String context) throws Exception {
+        /**
+         * Extract the contents of the account creation context. This contents
+         * is formatted as follows:
+         *  appId:appKey:realm
+         */
+        String[] parts = context.split(":");
+        
+        if (parts.length != 3) {
+            throw new Exception(ApplicationError.INVALID_PARAMETERS);
+        }
+        
+        String clientAppId = parts[0];
+        String clientAppKey = parts[1];
+        String clientRealm = parts[2];
+        
+        /** 
+         * Check that the authentication context has the correct parameters.
+         * To do this, create a concatenated string of those parameters and 
+         * compare it with the expected values.
+         */
+        String expectedContext = String.format("%s:%s:%s", 
+            appId, appKey, appRealm);
+        String receivedContext = String.format("%s:%s:%s", 
+            clientAppId, clientAppKey, clientRealm);
+        
+        return expectedContext.equals(receivedContext);
+        
+    }
+    
+    
     private void startNewSessionForUser(User user, String client) {
         UserSessionDao sessionDao = mapper.userSessionDao();
         
