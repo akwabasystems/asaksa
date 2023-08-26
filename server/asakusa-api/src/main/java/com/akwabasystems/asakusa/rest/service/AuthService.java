@@ -267,7 +267,8 @@ public class AuthService {
         Map<String,Object> status = new HashMap<>();
         status.put("activeStatus", hasExpired ? ItemStatus.EXPIRED.toString() : 
                 ItemStatus.ACTIVE.toString());
-        status.put("verified", isVerified);
+        status.put("verificationStatus", isVerified ? ItemStatus.VERIFIED.toString() : 
+                ItemStatus.UNVERIFIED.toString());
         
         return status;
         
