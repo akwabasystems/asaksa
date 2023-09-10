@@ -274,4 +274,33 @@ public class AuthService {
         
     }
     
+    
+    /**
+     * Ends the session for the user with the specified credentials
+     * 
+     * @param authTicket        the authorization ticket for the request
+     * @return the user details on successful login
+     * @throws Exception if the operation fails
+     */
+    public Map<String,Object> logout(AuthorizationTicket authTicket) throws Exception {
+        UserDao userDao = mapper.userDao();
+        
+        User user = userDao.findById(authTicket.getUserId());
+        
+        if (user == null) {
+            throw new Exception(ApplicationError.USER_NOT_FOUND);
+        }
+        
+        System.out.println(PrintUtils.DASHES);
+        System.out.println("Logging out user: " + user);
+        System.out.println(PrintUtils.DASHES);
+        
+        // End session for user
+        // deactivate token for user
+        
+        Map<String,Object> response = new HashMap<>();
+        response.put("authenticated", false);
+        return response;
+    }
+    
 }
