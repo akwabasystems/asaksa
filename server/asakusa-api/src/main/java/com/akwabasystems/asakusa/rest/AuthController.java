@@ -118,4 +118,26 @@ public class AuthController extends BaseController {
 
     }
     
+    
+    /**
+     * Handles user logout
+     * 
+     * @param request       the incoming request
+     * @param response      the outgoing response
+     * @param map           the request body
+     * @return the outcome of the logout operation
+     * @throws Exception if the request fails
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    @RequestBody LinkedHashMap<String,Object> map) 
+                                    throws Exception {        
+        String userId = (String) QueryUtils.getValueRequired(map, QueryParameter.USER_ID);
+
+        Map<String,Object> logoutResponse = authService.logout(getAuthorizationTicket(userId));
+        return ResponseEntity.ok(logoutResponse);
+
+    }
+    
 }

@@ -3,10 +3,12 @@ package com.akwabasystems.asakusa.rest.service;
 
 import com.akwabasystems.asakusa.dao.PhoneVerificationDao;
 import com.akwabasystems.asakusa.dao.UserDao;
+import com.akwabasystems.asakusa.dao.UserSessionDao;
 import com.akwabasystems.asakusa.model.ItemStatus;
 import com.akwabasystems.asakusa.model.PhoneNumberVerification;
 import com.akwabasystems.asakusa.model.User;
 import com.akwabasystems.asakusa.model.UserCredentials;
+import com.akwabasystems.asakusa.model.UserSession;
 import com.akwabasystems.asakusa.repository.RepositoryMapper;
 import com.akwabasystems.asakusa.rest.utils.ApplicationError;
 import com.akwabasystems.asakusa.rest.utils.AuthorizationTicket;
@@ -16,9 +18,15 @@ import com.akwabasystems.asakusa.utils.PasswordUtils;
 import com.akwabasystems.asakusa.utils.PrintUtils;
 import com.akwabasystems.asakusa.utils.Timeline;
 import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.PagingIterable;
+import com.datastax.oss.driver.api.core.uuid.Uuids;
 import jakarta.annotation.PostConstruct;
+import java.time.Clock;
+import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -140,8 +148,56 @@ public class AuthService {
             throw new Exception(ApplicationError.INVALID_CREDENTIALS);
         }
         
+        /** Step 5: Start a new session for the user */
+        startNewSessionForUser(user, client);
+        
         UserResponse userInfo = UserResponse.fromUser(user);
         return new LoginResponse(userInfo, new HashMap<String, Object>(), new HashMap<String,Object>());
+        
+    }
+    
+    
+    private void startNewSessionForUser(User user, String client) throws Exception {
+        UserSessionDao sessionDao = mapper.userSessionDao();
+        UserSession lastSession = getLastSessionForUser(user);
+        
+        boolean isActiveSession = (lastSession != null && lastSession.getStatus() == ItemStatus.ACTIVE);
+        
+        /**
+         * If the last session has been active for more than 8 hours, end it and start a new one
+         */
+        Instant currentTimeUTC = Instant.now(Clock.systemUTC());
+        boolean hasExpired = lastSession.getStartDate().plus(8, ChronoUnit.HOURS).isBefore(currentTimeUTC);
+        
+        if (hasExpired) {
+            endSession(lastSession);
+            isActiveSession = false;
+        }
+        
+        if (!isActiveSession) {
+            UserSession newSession = new UserSession(user.getUserId(), Uuids.timeBased());
+            newSession.setClient(client);
+            sessionDao.create(newSession);
+        }
+    }
+    
+    
+    private UserSession getLastSessionForUser(User user) {
+        UserSessionDao sessionDao = mapper.userSessionDao();
+        
+        PagingIterable<UserSession> userSessions = sessionDao.findAll(user.getUserId());
+        List<UserSession> userSessionList = userSessions.all();
+        
+        return userSessionList.isEmpty() ? null : userSessionList.get(0);
+    }
+    
+    
+    private void endSession(UserSession session) throws Exception {
+        UserSessionDao sessionDao = mapper.userSessionDao();
+            
+        session.setEndDate(Instant.now(Clock.systemUTC()));
+        session.setStatus(ItemStatus.INACTIVE);
+        sessionDao.save(session);
         
     }
     
@@ -272,6 +328,38 @@ public class AuthService {
         
         return status;
         
+    }
+    
+    
+    /**
+     * Ends the session for the user with the specified credentials
+     * 
+     * @param authTicket        the authorization ticket for the request
+     * @return the user details on successful login
+     * @throws Exception if the operation fails
+     */
+    public Map<String,Object> logout(AuthorizationTicket authTicket) throws Exception {
+        UserDao userDao = mapper.userDao();
+        
+        User user = userDao.findById(authTicket.getUserId());
+        
+        if (user == null) {
+            throw new Exception(ApplicationError.USER_NOT_FOUND);
+        }
+        
+        /** End the user's session */
+        UserSession lastSession = getLastSessionForUser(user);
+        boolean isActiveSession = (lastSession != null && lastSession.getStatus() == ItemStatus.ACTIVE);
+
+        if (isActiveSession) {
+            endSession(lastSession);
+        }
+        
+        // deactivate token for user
+        
+        Map<String,Object> response = new HashMap<>();
+        response.put("authenticated", false);
+        return response;
     }
     
 }
