@@ -1,8 +1,10 @@
 
 package com.akwabasystems.asakusa.rest;
 
+import com.akwabasystems.asakusa.model.AccessToken;
 import com.akwabasystems.asakusa.model.User;
 import com.akwabasystems.asakusa.model.UserPreferences;
+import com.akwabasystems.asakusa.rest.service.AuthService;
 import com.akwabasystems.asakusa.rest.utils.UserResponse;
 import com.akwabasystems.asakusa.rest.service.UserService;
 import com.akwabasystems.asakusa.rest.utils.ApplicationError;
@@ -40,6 +42,9 @@ public class UserController extends BaseController {
 
     @Autowired
     private UserService userService;
+    
+    @Autowired
+    private AuthService authService;
     
     
     /**
@@ -92,8 +97,13 @@ public class UserController extends BaseController {
             String userInfoURI = String.format("/api/v3/users/%s", userId);
     
             UserResponse userInfo = UserResponse.fromUser(user);
-            LoginResponse responseBody = new LoginResponse(userInfo, 
-                    new HashMap<String, Object>(), new HashMap<String,Object>());
+            
+            Map<String,Object> accountSummary = userService.getAccountSummary(user);
+            Map<String,Object> accountSettings = userService.getUserPreferences(user).getSettings().toMap();
+            AccessToken accessToken = authService.createAccessTokenForUser(user);
+                
+            LoginResponse responseBody = new LoginResponse(userInfo, accountSummary, 
+                    accountSettings, accessToken);
         
             /** Return an HTTP 201 (Created) response with the user details */
             return ResponseEntity.created(new URI(userInfoURI)).body(responseBody);

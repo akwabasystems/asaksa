@@ -57,6 +57,9 @@ public class AuthService {
     @Autowired
     private SMSService smsService;
     
+    @Autowired
+    private UserService userService;
+    
     private RepositoryMapper mapper;
     private String nonce;
     private static final String QOP = "auth";
@@ -153,12 +156,16 @@ public class AuthService {
         startNewSessionForUser(user, client);
         
         /** Step 6: Create a new access token for the user */
-        createAccessTokenForUser(user);
+        AccessToken accessToken = createAccessTokenForUser(user);
         
+        Map<String,Object> accountSummary = userService.getAccountSummary(user);
+        Map<String,Object> accountSettings = userService.getUserPreferences(user).getSettings().toMap();
         UserResponse userInfo = UserResponse.fromUser(user);
-        return new LoginResponse(userInfo, new HashMap<String, Object>(), new HashMap<String,Object>());
+        
+        return new LoginResponse(userInfo, accountSummary, accountSettings, accessToken);
         
     }
+    
     
     
     public void startNewSessionForUser(User user, String client) throws Exception {
@@ -205,7 +212,7 @@ public class AuthService {
     }
     
     
-    public void createAccessTokenForUser(User user) throws Exception {
+    public AccessToken createAccessTokenForUser(User user) throws Exception {
         AccessTokenDao accessTokenDao = mapper.accessTokenDao();
 
         /**
@@ -222,6 +229,8 @@ public class AuthService {
         AccessToken accessToken = new AccessToken(user.getUserId(), Uuids.timeBased());
         accessToken.setTokenKey(UUID.randomUUID().toString());
         accessTokenDao.create(accessToken);
+        
+        return accessToken;
     }
     
     
