@@ -1,9 +1,11 @@
 
 package com.akwabasystems.asakusa.rest.service;
 
+import com.akwabasystems.asakusa.dao.AccessTokenDao;
 import com.akwabasystems.asakusa.dao.PhoneVerificationDao;
 import com.akwabasystems.asakusa.dao.UserDao;
 import com.akwabasystems.asakusa.dao.UserSessionDao;
+import com.akwabasystems.asakusa.model.AccessToken;
 import com.akwabasystems.asakusa.model.ItemStatus;
 import com.akwabasystems.asakusa.model.PhoneNumberVerification;
 import com.akwabasystems.asakusa.model.User;
@@ -15,7 +17,6 @@ import com.akwabasystems.asakusa.rest.utils.AuthorizationTicket;
 import com.akwabasystems.asakusa.rest.utils.LoginResponse;
 import com.akwabasystems.asakusa.rest.utils.UserResponse;
 import com.akwabasystems.asakusa.utils.PasswordUtils;
-import com.akwabasystems.asakusa.utils.PrintUtils;
 import com.akwabasystems.asakusa.utils.Timeline;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.PagingIterable;
@@ -151,13 +152,16 @@ public class AuthService {
         /** Step 5: Start a new session for the user */
         startNewSessionForUser(user, client);
         
+        /** Step 6: Create a new access token for the user */
+        createAccessTokenForUser(user);
+        
         UserResponse userInfo = UserResponse.fromUser(user);
         return new LoginResponse(userInfo, new HashMap<String, Object>(), new HashMap<String,Object>());
         
     }
     
     
-    private void startNewSessionForUser(User user, String client) throws Exception {
+    public void startNewSessionForUser(User user, String client) throws Exception {
         UserSessionDao sessionDao = mapper.userSessionDao();
         UserSession lastSession = getLastSessionForUser(user);
         
@@ -182,7 +186,7 @@ public class AuthService {
     }
     
     
-    private UserSession getLastSessionForUser(User user) {
+    public UserSession getLastSessionForUser(User user) {
         UserSessionDao sessionDao = mapper.userSessionDao();
         
         PagingIterable<UserSession> userSessions = sessionDao.findAll(user.getUserId());
@@ -198,7 +202,42 @@ public class AuthService {
         session.setEndDate(Instant.now(Clock.systemUTC()));
         session.setStatus(ItemStatus.INACTIVE);
         sessionDao.save(session);
+    }
+    
+    
+    public void createAccessTokenForUser(User user) throws Exception {
+        AccessTokenDao accessTokenDao = mapper.accessTokenDao();
+
+        /**
+         * If the user still has an active access token (this happens if the user
+         * is logged in on a different device), deactivate that token before
+         * creating a new one.
+         */
+        AccessToken lastAccessToken = getLastAccessTokenForUser(user);
         
+        if (lastAccessToken.getStatus() == ItemStatus.ACTIVE) {
+            deactivateAccessToken(lastAccessToken);
+        }
+        
+        AccessToken accessToken = new AccessToken(user.getUserId(), Uuids.timeBased());
+        accessToken.setTokenKey(UUID.randomUUID().toString());
+        accessTokenDao.create(accessToken);
+    }
+    
+    
+    public AccessToken getLastAccessTokenForUser(User user) {
+        AccessTokenDao accessTokenDao = mapper.accessTokenDao();
+        
+        PagingIterable<AccessToken> accessTokens = accessTokenDao.findAll(user.getUserId());
+        List<AccessToken> accessTokenList = accessTokens.all();
+        
+        return accessTokenList.isEmpty() ? null : accessTokenList.get(0);
+    }
+    
+    
+    private void deactivateAccessToken(AccessToken accessToken) throws Exception {
+        accessToken.setStatus(ItemStatus.EXPIRED);
+        mapper.accessTokenDao().save(accessToken);
     }
     
     
@@ -260,10 +299,6 @@ public class AuthService {
         String body = smsService.generateBodyForPhoneVerificationCode(
                 preferredLocale, phoneVerification.getCode());
         smsService.sendMessageToPhone(phoneNumber, body);
-        
-        System.out.println(PrintUtils.DASHES);
-        System.out.println(body);
-        System.out.println(PrintUtils.DASHES);
         
         return phoneVerification;
         
@@ -355,7 +390,8 @@ public class AuthService {
             endSession(lastSession);
         }
         
-        // deactivate token for user
+        /** deactivate the access token for the user */
+        deactivateAccessToken(getLastAccessTokenForUser(user));
         
         Map<String,Object> response = new HashMap<>();
         response.put("authenticated", false);

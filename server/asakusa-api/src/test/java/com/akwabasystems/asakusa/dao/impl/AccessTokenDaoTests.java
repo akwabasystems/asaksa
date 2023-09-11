@@ -60,12 +60,12 @@ public class AccessTokenDaoTests extends BaseTestSuite {
         List<AccessToken> accessTokenList = accessTokens.all();
         assertThat(accessTokenList.isEmpty()).isFalse();
         
-        accessTokenById.setStatus(ItemStatus.INACTIVE);
+        accessTokenById.setStatus(ItemStatus.EXPIRED);
         accessTokenDao.save(accessTokenById);
         
         accessTokenById = accessTokenDao.findById(user.getUserId(), accessTokenById.getId());
         
-        assertThat(accessTokenById.getStatus()).isEqualTo(ItemStatus.INACTIVE);
+        assertThat(accessTokenById.getStatus()).isEqualTo(ItemStatus.EXPIRED);
         
         accessTokenDao.delete(accessTokenById);
         
