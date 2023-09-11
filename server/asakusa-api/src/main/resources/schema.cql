@@ -221,3 +221,13 @@ CREATE TABLE IF NOT EXISTS user_sessions (
     end_date timestamp,
     PRIMARY KEY (("user_id"), "id")
 ) WITH CLUSTERING ORDER BY ("id" DESC);
+
+
+CREATE TABLE IF NOT EXISTS access_tokens (
+    user_id text,
+    id timeuuid,
+    token_key text,
+    status text,
+    created_date timestamp,
+    PRIMARY KEY (("user_id"), "id")
+) WITH CLUSTERING ORDER BY ("id" DESC);

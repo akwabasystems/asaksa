@@ -1,6 +1,7 @@
 
 package com.akwabasystems.asakusa.repository;
 
+import com.akwabasystems.asakusa.dao.AccessTokenDao;
 import com.akwabasystems.asakusa.dao.DeviceTokenDao;
 import com.akwabasystems.asakusa.dao.MembershipDao;
 import com.akwabasystems.asakusa.dao.PhoneNumberDao;
@@ -53,6 +54,9 @@ public interface RepositoryMapper {
     
     @DaoFactory
     UserSessionDao userSessionDao();
+    
+    @DaoFactory
+    AccessTokenDao accessTokenDao();
     
     static MapperBuilder<RepositoryMapper> builder(CqlSession cqlSession) {
         return new RepositoryMapperBuilder(cqlSession);

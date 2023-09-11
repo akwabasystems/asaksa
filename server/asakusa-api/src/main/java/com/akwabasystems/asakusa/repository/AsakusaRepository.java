@@ -534,6 +534,28 @@ public class AsakusaRepository {
                     .withClusteringOrder(SchemaNames.COLUMN_ID, ClusteringOrder.DESC)
                     .build());
         logger.info(String.format("Table '%s' has been created (if needed)", SchemaNames.TABLE_USER_SESSIONS.asInternal()));
+        
+        /**
+         * CREATE TABLE IF NOT EXISTS access_tokens (
+         *   user_id text,
+         *   id timeuuid,
+         *   token_key text,
+         *   status text,
+         *   created_date timestamp,
+         *   PRIMARY KEY (("user_id"), "id")
+         * ) WITH CLUSTERING ORDER BY ("id" DESC);
+         */
+        cqlSession.execute(
+            createTable(keyspaceName, SchemaNames.TABLE_ACCESS_TOKENS)
+                    .ifNotExists()
+                    .withPartitionKey(SchemaNames.COLUMN_USER_ID, DataTypes.TEXT)
+                    .withClusteringColumn(SchemaNames.COLUMN_ID, DataTypes.TIMEUUID)
+                    .withColumn(SchemaNames.COLUMN_TOKEN_KEY, DataTypes.TEXT)
+                    .withColumn(SchemaNames.COLUMN_STATUS, DataTypes.TEXT)
+                    .withColumn(SchemaNames.COLUMN_CREATED_DATE, DataTypes.TIMESTAMP)
+                    .withClusteringOrder(SchemaNames.COLUMN_ID, ClusteringOrder.DESC)
+                    .build());
+        logger.info(String.format("Table '%s' has been created (if needed)", SchemaNames.TABLE_ACCESS_TOKENS.asInternal()));
 
     }
 }
