@@ -12,7 +12,6 @@ import com.akwabasystems.asakusa.rest.utils.AuthorizationTicket;
 import com.akwabasystems.asakusa.rest.utils.LoginResponse;
 import com.akwabasystems.asakusa.rest.utils.QueryParameter;
 import com.akwabasystems.asakusa.rest.utils.QueryUtils;
-import com.akwabasystems.asakusa.utils.PrintUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.net.URI;
@@ -62,10 +61,6 @@ public class UserController extends BaseController {
                                            @RequestBody LinkedHashMap<String,Object> map) 
                                            throws Exception {
         String context = (String) request.getHeader(QueryParameter.AUTH_CONTEXT);
-        System.out.println(PrintUtils.DASHES);
-        System.out.printf("COMTEXT: %s\n", context);
-        System.out.println(PrintUtils.DASHES);
-        
         Map<String,Object> parameterMap = new LinkedHashMap<>();
         
         String userId = (String) QueryUtils.getValueRequired(map, QueryParameter.USER_ID);
@@ -73,6 +68,7 @@ public class UserController extends BaseController {
         String firstName = (String)QueryUtils.getValueRequired(map, QueryParameter.FIRST_NAME);
         String lastName = (String)QueryUtils.getValueRequired(map, QueryParameter.LAST_NAME);
         String password = (String)QueryUtils.getValueRequired(map, QueryParameter.PASSWORD);
+        String client = (String)QueryUtils.getValueRequired(map, QueryParameter.CLIENT);
         String locale = (String) QueryUtils.getValueWithDefault(map, QueryParameter.LOCALE, "en");
         String gender = (String) QueryUtils.getValueWithDefault(map, QueryParameter.GENDER, "FEMALE");
         
@@ -100,7 +96,7 @@ public class UserController extends BaseController {
             
             Map<String,Object> accountSummary = userService.getAccountSummary(user);
             Map<String,Object> accountSettings = userService.getUserPreferences(user).getSettings().toMap();
-            AccessToken accessToken = authService.createAccessTokenForUser(user);
+            AccessToken accessToken = authService.createAccessToken(client);
                 
             LoginResponse responseBody = new LoginResponse(userInfo, accountSummary, 
                     accountSettings, accessToken);

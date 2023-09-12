@@ -146,7 +146,7 @@ public class UserService {
          */
         String[] parts = context.split(":");
         
-        if (parts.length != 3) {
+        if (parts.length < 3) {
             throw new Exception(ApplicationError.INVALID_PARAMETERS);
         }
         

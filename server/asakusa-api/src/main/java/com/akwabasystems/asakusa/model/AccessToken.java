@@ -1,15 +1,11 @@
 
 package com.akwabasystems.asakusa.model;
 
-import com.datastax.oss.driver.api.mapper.annotations.ClusteringColumn;
 import com.datastax.oss.driver.api.mapper.annotations.CqlName;
 import com.datastax.oss.driver.api.mapper.annotations.Entity;
 import com.datastax.oss.driver.api.mapper.annotations.NamingStrategy;
 import com.datastax.oss.driver.api.mapper.annotations.PartitionKey;
 import com.datastax.oss.driver.api.mapper.entity.naming.NamingConvention;
-import java.time.Clock;
-import java.time.Instant;
-import java.util.UUID;
 
 
 @Entity
@@ -18,36 +14,26 @@ import java.util.UUID;
 public class AccessToken {
 
     @PartitionKey
-    private String userId;
-    
-    @ClusteringColumn
-    private UUID id;
+    private String deviceId;
     
     private String tokenKey;
     private ItemStatus status = ItemStatus.ACTIVE;
-    private Instant createdDate = Instant.now(Clock.systemUTC());
+    private String createdDate;
+    private String lastModifiedDate;
     
     public AccessToken() {}
     
-    public AccessToken(String userId, UUID id) {
-        this.userId = userId;
-        this.id = id;
+    public AccessToken(String deviceId, String tokenKey) {
+        this.deviceId = deviceId;
+        this.tokenKey = tokenKey;
     }
     
-    public String getUserId() {
-        return userId;
+    public String getDeviceId() {
+        return deviceId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
     }
 
     public String getTokenKey() {
@@ -66,19 +52,27 @@ public class AccessToken {
         this.status = status;
     }
 
-    public Instant getCreatedDate() {
+    public String getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Instant createdDate) {
+    public void setCreatedDate(String createdDate) {
         this.createdDate = createdDate;
+    }
+    
+    public String getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(String lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 
 
     @Override
     public String toString() {
-        return String.format("AccessToken { userId: %s, createdDate: %s, status: %s }", 
-                getUserId(), getCreatedDate(), getStatus());
+        return String.format("AccessToken { deviceId: %s, token: %s, lastModifiedDate: %s, status: %s }", 
+                getDeviceId(), getTokenKey(), getLastModifiedDate(), getStatus());
     }
 
     @Override
@@ -91,17 +85,15 @@ public class AccessToken {
             return true;
         }
 
-        AccessToken session = (AccessToken) object;
-        return (session.getUserId() != null && session.getId().equals(getId())) &&
-               (session.getId() != null && session.getId().equals(getId())) &&
-               (session.getCreatedDate() != null && session.getCreatedDate().equals(getCreatedDate()));
+        AccessToken token = (AccessToken) object;
+        return (token.getDeviceId() != null && token.getDeviceId().equals(getDeviceId())) &&
+               (token.getTokenKey() != null && token.getTokenKey().equals(getTokenKey()));
     }
 
     @Override
     public int hashCode() {
-        int result = 17 * ((getUserId() != null) ? getUserId().hashCode() : Integer.hashCode(1));
-        result += 31 * ((getId() != null) ? getId().hashCode() : Integer.hashCode(1));
-        result += 31 * ((getCreatedDate() != null) ? getCreatedDate().hashCode() : Integer.hashCode(1));
+        int result = 17 * ((getDeviceId() != null) ? getDeviceId().hashCode() : Integer.hashCode(1));
+        result += 31 * ((getTokenKey() != null) ? getTokenKey().hashCode() : Integer.hashCode(1));
 
         return result;
     }

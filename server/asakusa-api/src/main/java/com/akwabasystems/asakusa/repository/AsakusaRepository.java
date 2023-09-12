@@ -537,23 +537,21 @@ public class AsakusaRepository {
         
         /**
          * CREATE TABLE IF NOT EXISTS access_tokens (
-         *   user_id text,
-         *   id timeuuid,
+         *   device_id text PRIMARY KEY,
          *   token_key text,
          *   status text,
-         *   created_date timestamp,
-         *   PRIMARY KEY (("user_id"), "id")
-         * ) WITH CLUSTERING ORDER BY ("id" DESC);
+         *   created_date text,
+         *   last_modified_date text
+         * );
          */
         cqlSession.execute(
             createTable(keyspaceName, SchemaNames.TABLE_ACCESS_TOKENS)
                     .ifNotExists()
-                    .withPartitionKey(SchemaNames.COLUMN_USER_ID, DataTypes.TEXT)
-                    .withClusteringColumn(SchemaNames.COLUMN_ID, DataTypes.TIMEUUID)
+                    .withPartitionKey(SchemaNames.COLUMN_DEVICE_ID, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_TOKEN_KEY, DataTypes.TEXT)
                     .withColumn(SchemaNames.COLUMN_STATUS, DataTypes.TEXT)
-                    .withColumn(SchemaNames.COLUMN_CREATED_DATE, DataTypes.TIMESTAMP)
-                    .withClusteringOrder(SchemaNames.COLUMN_ID, ClusteringOrder.DESC)
+                    .withColumn(SchemaNames.COLUMN_CREATED_DATE, DataTypes.TEXT)
+                    .withColumn(SchemaNames.COLUMN_LAST_MODIFIED_DATE, DataTypes.TEXT)
                     .build());
         logger.info(String.format("Table '%s' has been created (if needed)", SchemaNames.TABLE_ACCESS_TOKENS.asInternal()));
 

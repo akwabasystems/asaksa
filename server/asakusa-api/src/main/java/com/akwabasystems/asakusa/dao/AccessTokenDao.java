@@ -2,7 +2,6 @@
 package com.akwabasystems.asakusa.dao;
 
 import com.akwabasystems.asakusa.model.AccessToken;
-import com.datastax.oss.driver.api.core.PagingIterable;
 import com.datastax.oss.driver.api.mapper.annotations.Dao;
 import com.datastax.oss.driver.api.mapper.annotations.DefaultNullSavingStrategy;
 import com.datastax.oss.driver.api.mapper.annotations.Delete;
@@ -11,7 +10,6 @@ import com.datastax.oss.driver.api.mapper.annotations.Select;
 import com.datastax.oss.driver.api.mapper.annotations.StatementAttributes;
 import com.datastax.oss.driver.api.mapper.annotations.Update;
 import static com.datastax.oss.driver.api.mapper.entity.saving.NullSavingStrategy.SET_TO_NULL;
-import java.util.UUID;
 
 
 @Dao
@@ -40,26 +38,15 @@ public interface AccessTokenDao {
     
     
     /**
-     * Finds an access token by ID
+     * Finds the access token for the specified device ID
      * 
-     * @param userId    the user ID for which to find the token
-     * @param id        the ID of the access token to find
-     * @return the access token with the specified ID
+     * @param deviceId  the ID of the device for which to retrieve the access token
+     * @return the access token for the specified device ID
      */
     @Select
-    AccessToken findById(String userId, UUID id);
+    AccessToken findById(String deviceId);
 
-    
-    /**
-     * Returns all the access tokens for the specified user
-     *
-     * @param userId    the ID of the user for whom to return the tokens
-     * @return all the access tokens for the specified user
-     */
-    @Select
-    PagingIterable<AccessToken> findAll(String userId);
-    
-    
+   
     /**
      * Deletes the specified access token
      * 

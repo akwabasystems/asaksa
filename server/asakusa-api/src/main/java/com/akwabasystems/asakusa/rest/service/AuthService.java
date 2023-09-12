@@ -156,7 +156,7 @@ public class AuthService {
         startNewSessionForUser(user, client);
         
         /** Step 6: Create a new access token for the user */
-        AccessToken accessToken = createAccessTokenForUser(user);
+        AccessToken accessToken = createAccessToken(client);
         
         Map<String,Object> accountSummary = userService.getAccountSummary(user);
         Map<String,Object> accountSettings = userService.getUserPreferences(user).getSettings().toMap();
@@ -165,7 +165,6 @@ public class AuthService {
         return new LoginResponse(userInfo, accountSummary, accountSettings, accessToken);
         
     }
-    
     
     
     public void startNewSessionForUser(User user, String client) throws Exception {
@@ -212,40 +211,28 @@ public class AuthService {
     }
     
     
-    public AccessToken createAccessTokenForUser(User user) throws Exception {
+    public AccessToken createAccessToken(String clientId) throws Exception {
         AccessTokenDao accessTokenDao = mapper.accessTokenDao();
-
-        /**
-         * If the user still has an active access token (this happens if the user
-         * is logged in on a different device), deactivate that token before
-         * creating a new one.
-         */
-        AccessToken lastAccessToken = getLastAccessTokenForUser(user);
         
-        if (lastAccessToken.getStatus() == ItemStatus.ACTIVE) {
-            deactivateAccessToken(lastAccessToken);
-        }
-        
-        AccessToken accessToken = new AccessToken(user.getUserId(), Uuids.timeBased());
+        AccessToken accessToken = new AccessToken(clientId, UUID.randomUUID().toString());
         accessToken.setTokenKey(UUID.randomUUID().toString());
+        accessToken.setCreatedDate(Timeline.currentDateTimeUTCString());
+        accessToken.setLastModifiedDate(Timeline.currentDateTimeUTCString());
+        
         accessTokenDao.create(accessToken);
         
         return accessToken;
     }
     
     
-    public AccessToken getLastAccessTokenForUser(User user) {
-        AccessTokenDao accessTokenDao = mapper.accessTokenDao();
-        
-        PagingIterable<AccessToken> accessTokens = accessTokenDao.findAll(user.getUserId());
-        List<AccessToken> accessTokenList = accessTokens.all();
-        
-        return accessTokenList.isEmpty() ? null : accessTokenList.get(0);
+    public AccessToken getAccessTokenForClient(String clientId) {
+        return mapper.accessTokenDao().findById(clientId);
     }
     
     
     private void deactivateAccessToken(AccessToken accessToken) throws Exception {
         accessToken.setStatus(ItemStatus.EXPIRED);
+        accessToken.setLastModifiedDate(Timeline.currentDateTimeUTCString());
         mapper.accessTokenDao().save(accessToken);
     }
     
@@ -271,7 +258,7 @@ public class AuthService {
          */
         String[] parts = context.split(":");
         
-        if (parts.length != 3) {
+        if (parts.length < 3) {
             throw new Exception(ApplicationError.INVALID_PARAMETERS);
         }
         
@@ -332,11 +319,9 @@ public class AuthService {
          * is formatted as follows:
          *  appId:appKey:realm
          */
-        String[] parts = context.split(":");
+        validateRequestContext(context);
         
-        if (parts.length != 3) {
-            throw new Exception(ApplicationError.INVALID_PARAMETERS);
-        }
+        String[] parts = context.split(":");
         
         String clientAppId = parts[0];
         String clientAppKey = parts[1];
@@ -379,10 +364,11 @@ public class AuthService {
      * Ends the session for the user with the specified credentials
      * 
      * @param authTicket        the authorization ticket for the request
-     * @return the user details on successful login
+     * @param client            the client making the request
+     * @return the outcome of the logout operation
      * @throws Exception if the operation fails
      */
-    public Map<String,Object> logout(AuthorizationTicket authTicket) throws Exception {
+    public Map<String,Object> logout(AuthorizationTicket authTicket, String client) throws Exception {
         UserDao userDao = mapper.userDao();
         
         User user = userDao.findById(authTicket.getUserId());
@@ -400,11 +386,78 @@ public class AuthService {
         }
         
         /** deactivate the access token for the user */
-        deactivateAccessToken(getLastAccessTokenForUser(user));
+        deactivateAccessToken(getAccessTokenForClient(client));
         
         Map<String,Object> response = new HashMap<>();
         response.put("authenticated", false);
         return response;
+    }
+    
+    
+    /**
+     * Renews an access token for a client
+     * 
+     * @param authTicket    the authorization ticket for the request
+     * @param token         the current access token for the user
+     * @param context       an object that contains the request context
+     * @return a new access token for the user
+     * @throws Exception if the operation fails
+     */
+    public AccessToken renewAccessToken(AuthorizationTicket authTicket, 
+                                        String client,
+                                        String token,
+                                        String context) throws Exception {
+        // validateRequestContext(context);
+        
+        UserDao userDao = mapper.userDao();
+        User user = userDao.findById(authTicket.getUserId());
+        
+        if (user == null) {
+            throw new Exception(ApplicationError.USER_NOT_FOUND);
+        }
+        
+        /**
+         * Verify the access token to renew is actually the user's last access
+         * token; otherwise, throw an exception
+         */
+        AccessToken currentAccessToken = getAccessTokenForClient(client);
+        boolean isValidToken = (currentAccessToken != null && currentAccessToken.getTokenKey().equals(token));
+        
+        if (!isValidToken) {
+            throw new Exception(ApplicationError.INVALID_PARAMETERS);
+        }
+        
+        return createAccessToken(client);
+    }
+    
+    
+    private void validateRequestContext(String context) throws Exception {
+        /**
+         * Extract the contents of the request context. This contents is formatted 
+         * as follows:
+         *  appId:appKey:realm
+         * 
+         * If the format is incorrect, throw an exception
+         */
+        String[] parts = context.split(":");
+        
+        if (parts.length < 3) {
+            throw new Exception(ApplicationError.INVALID_PARAMETERS);
+        }
+        
+        String clientAppId = parts[0];
+        String clientAppKey = parts[1];
+        String clientRealm = parts[2];
+
+        String expectedContext = String.format("%s:%s:%s", 
+                appId, appKey, appRealm);
+        String receivedContext = String.format("%s:%s:%s", 
+            clientAppId, clientAppKey,clientRealm);
+        boolean isCorrectContext = expectedContext.equals(receivedContext);
+        
+        if (!isCorrectContext) {
+            throw new Exception(ApplicationError.INVALID_CREDENTIALS);
+        }
     }
     
 }

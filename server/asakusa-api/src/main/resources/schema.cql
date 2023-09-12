@@ -224,10 +224,9 @@ CREATE TABLE IF NOT EXISTS user_sessions (
 
 
 CREATE TABLE IF NOT EXISTS access_tokens (
-    user_id text,
-    id timeuuid,
+    device_id text PRIMARY KEY,
     token_key text,
     status text,
-    created_date timestamp,
-    PRIMARY KEY (("user_id"), "id")
-) WITH CLUSTERING ORDER BY ("id" DESC);
+    created_date text,
+    last_modified_date text
+);
