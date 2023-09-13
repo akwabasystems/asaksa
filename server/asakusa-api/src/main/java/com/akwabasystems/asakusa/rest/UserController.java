@@ -1,8 +1,10 @@
 
 package com.akwabasystems.asakusa.rest;
 
+import com.akwabasystems.asakusa.model.AccessToken;
 import com.akwabasystems.asakusa.model.User;
 import com.akwabasystems.asakusa.model.UserPreferences;
+import com.akwabasystems.asakusa.rest.service.AuthService;
 import com.akwabasystems.asakusa.rest.utils.UserResponse;
 import com.akwabasystems.asakusa.rest.service.UserService;
 import com.akwabasystems.asakusa.rest.utils.ApplicationError;
@@ -10,7 +12,6 @@ import com.akwabasystems.asakusa.rest.utils.AuthorizationTicket;
 import com.akwabasystems.asakusa.rest.utils.LoginResponse;
 import com.akwabasystems.asakusa.rest.utils.QueryParameter;
 import com.akwabasystems.asakusa.rest.utils.QueryUtils;
-import com.akwabasystems.asakusa.utils.PrintUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.net.URI;
@@ -41,6 +42,9 @@ public class UserController extends BaseController {
     @Autowired
     private UserService userService;
     
+    @Autowired
+    private AuthService authService;
+    
     
     /**
      * Handles a request to create a user account
@@ -57,10 +61,6 @@ public class UserController extends BaseController {
                                            @RequestBody LinkedHashMap<String,Object> map) 
                                            throws Exception {
         String context = (String) request.getHeader(QueryParameter.AUTH_CONTEXT);
-        System.out.println(PrintUtils.DASHES);
-        System.out.printf("COMTEXT: %s\n", context);
-        System.out.println(PrintUtils.DASHES);
-        
         Map<String,Object> parameterMap = new LinkedHashMap<>();
         
         String userId = (String) QueryUtils.getValueRequired(map, QueryParameter.USER_ID);
@@ -68,6 +68,7 @@ public class UserController extends BaseController {
         String firstName = (String)QueryUtils.getValueRequired(map, QueryParameter.FIRST_NAME);
         String lastName = (String)QueryUtils.getValueRequired(map, QueryParameter.LAST_NAME);
         String password = (String)QueryUtils.getValueRequired(map, QueryParameter.PASSWORD);
+        String client = (String)QueryUtils.getValueRequired(map, QueryParameter.CLIENT);
         String locale = (String) QueryUtils.getValueWithDefault(map, QueryParameter.LOCALE, "en");
         String gender = (String) QueryUtils.getValueWithDefault(map, QueryParameter.GENDER, "FEMALE");
         
@@ -92,8 +93,13 @@ public class UserController extends BaseController {
             String userInfoURI = String.format("/api/v3/users/%s", userId);
     
             UserResponse userInfo = UserResponse.fromUser(user);
-            LoginResponse responseBody = new LoginResponse(userInfo, 
-                    new HashMap<String, Object>(), new HashMap<String,Object>());
+            
+            Map<String,Object> accountSummary = userService.getAccountSummary(user);
+            Map<String,Object> accountSettings = userService.getUserPreferences(user).getSettings().toMap();
+            AccessToken accessToken = authService.createAccessToken(client);
+                
+            LoginResponse responseBody = new LoginResponse(userInfo, accountSummary, 
+                    accountSettings, accessToken);
         
             /** Return an HTTP 201 (Created) response with the user details */
             return ResponseEntity.created(new URI(userInfoURI)).body(responseBody);

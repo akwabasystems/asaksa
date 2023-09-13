@@ -1,8 +1,10 @@
 
 package com.akwabasystems.asakusa.rest;
 
+import com.akwabasystems.asakusa.model.AccessToken;
 import com.akwabasystems.asakusa.model.PhoneNumberVerification;
 import com.akwabasystems.asakusa.rest.service.AuthService;
+import com.akwabasystems.asakusa.rest.utils.AuthorizationTicket;
 import com.akwabasystems.asakusa.rest.utils.LoginResponse;
 import com.akwabasystems.asakusa.rest.utils.QueryParameter;
 import com.akwabasystems.asakusa.rest.utils.QueryUtils;
@@ -62,7 +64,7 @@ public class AuthController extends BaseController {
                                    throws Exception {
         String context = (String) request.getHeader(QueryParameter.AUTH_CONTEXT);         
         String userId = (String) QueryUtils.getValueRequired(map, QueryParameter.USER_ID);
-        String client = (String) QueryUtils.getValueWithDefault(map, QueryParameter.CLIENT, "N/A");
+        String client = (String) QueryUtils.getValueRequired(map, QueryParameter.CLIENT);
 
         LoginResponse loginInfo = authService.login(getAuthorizationTicket(userId), context, client);
         return ResponseEntity.ok(loginInfo);
@@ -134,10 +136,64 @@ public class AuthController extends BaseController {
                                     @RequestBody LinkedHashMap<String,Object> map) 
                                     throws Exception {        
         String userId = (String) QueryUtils.getValueRequired(map, QueryParameter.USER_ID);
+        String client = (String) QueryUtils.getValueRequired(map, QueryParameter.CLIENT);
 
-        Map<String,Object> logoutResponse = authService.logout(getAuthorizationTicket(userId));
+        Map<String,Object> logoutResponse = authService.logout(getAuthorizationTicket(userId), client);
         return ResponseEntity.ok(logoutResponse);
 
     }
     
+    
+    /**
+     * Handles access token renewals
+     * 
+     * @param request       the incoming request
+     * @param response      the outgoing response
+     * @param map           the request body
+     * @return a new access token object
+     * @throws Exception if the request fails
+     */
+    @PostMapping("/access-tokens")
+    public ResponseEntity<AccessToken> renewAccessToken(HttpServletRequest request,
+                                                        HttpServletResponse response,
+                                                        @RequestBody LinkedHashMap<String,Object> map) 
+                                                        throws Exception {
+        String context = (String) request.getHeader(QueryParameter.AUTH_CONTEXT);         
+        String userId = (String) QueryUtils.getValueRequired(map, QueryParameter.USER_ID);
+        String client = (String) QueryUtils.getValueRequired(map, QueryParameter.CLIENT);
+        String token = (String) QueryUtils.getValueRequired(map, QueryParameter.TOKEN);
+        
+        AccessToken accessToken = authService.renewAccessToken(getAuthorizationTicket(userId), 
+                client, token, context);
+        return ResponseEntity.ok(accessToken);
+
+    }
+    
+    
+    /**
+     * Handles user session renewals
+     * 
+     * @param request       the incoming request
+     * @param response      the outgoing response
+     * @param map           the request body
+     * @return a new access token object for the user's new session
+     * @throws Exception if the request fails
+     */
+    @PostMapping("/user-sessions")
+    public ResponseEntity<AccessToken> startUserSession(HttpServletRequest request,
+                                                        HttpServletResponse response,
+                                                        @RequestBody LinkedHashMap<String,Object> map) 
+                                                        throws Exception {
+        String context = (String) request.getHeader(QueryParameter.AUTH_CONTEXT);         
+        String userId = (String) QueryUtils.getValueRequired(map, QueryParameter.USER_ID);
+        String client = (String) QueryUtils.getValueRequired(map, QueryParameter.CLIENT);
+        String token = (String) QueryUtils.getValueRequired(map, QueryParameter.TOKEN);
+        
+        AuthorizationTicket authTicket = getAuthorizationTicket(userId);
+        authService.startNewSessionForUser(authTicket, client);
+        AccessToken accessToken = authService.renewAccessToken(authTicket,  
+                client, token, context);
+        return ResponseEntity.ok(accessToken);
+
+    }
 }

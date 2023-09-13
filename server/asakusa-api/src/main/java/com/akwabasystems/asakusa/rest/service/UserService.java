@@ -5,6 +5,7 @@ import com.akwabasystems.asakusa.dao.MembershipDao;
 import com.akwabasystems.asakusa.dao.UserDao;
 import com.akwabasystems.asakusa.dao.UserSessionDao;
 import com.akwabasystems.asakusa.model.Gender;
+import com.akwabasystems.asakusa.model.ItemStatus;
 import com.akwabasystems.asakusa.model.Membership;
 import com.akwabasystems.asakusa.model.MembershipType;
 import com.akwabasystems.asakusa.model.Role;
@@ -145,7 +146,7 @@ public class UserService {
          */
         String[] parts = context.split(":");
         
-        if (parts.length != 3) {
+        if (parts.length < 3) {
             throw new Exception(ApplicationError.INVALID_PARAMETERS);
         }
         
@@ -288,5 +289,17 @@ public class UserService {
         
         return userPreferences;
     }
+    
+    
+    
+    public Map<String,Object> getAccountSummary(User user) throws Exception {
+        Map<String,Object> accountSummary = new HashMap<>();
+        accountSummary.put("followers", 0);
+        accountSummary.put("following", 0);
+        accountSummary.put("accountStatus", ItemStatus.ACTIVE.toString());
+        
+        return accountSummary;
+    }
+    
     
 }

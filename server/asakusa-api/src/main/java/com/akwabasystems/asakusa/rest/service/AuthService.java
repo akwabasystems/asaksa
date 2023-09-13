@@ -1,9 +1,11 @@
 
 package com.akwabasystems.asakusa.rest.service;
 
+import com.akwabasystems.asakusa.dao.AccessTokenDao;
 import com.akwabasystems.asakusa.dao.PhoneVerificationDao;
 import com.akwabasystems.asakusa.dao.UserDao;
 import com.akwabasystems.asakusa.dao.UserSessionDao;
+import com.akwabasystems.asakusa.model.AccessToken;
 import com.akwabasystems.asakusa.model.ItemStatus;
 import com.akwabasystems.asakusa.model.PhoneNumberVerification;
 import com.akwabasystems.asakusa.model.User;
@@ -15,7 +17,6 @@ import com.akwabasystems.asakusa.rest.utils.AuthorizationTicket;
 import com.akwabasystems.asakusa.rest.utils.LoginResponse;
 import com.akwabasystems.asakusa.rest.utils.UserResponse;
 import com.akwabasystems.asakusa.utils.PasswordUtils;
-import com.akwabasystems.asakusa.utils.PrintUtils;
 import com.akwabasystems.asakusa.utils.Timeline;
 import com.datastax.oss.driver.api.core.CqlSession;
 import com.datastax.oss.driver.api.core.PagingIterable;
@@ -55,6 +56,9 @@ public class AuthService {
     
     @Autowired
     private SMSService smsService;
+    
+    @Autowired
+    private UserService userService;
     
     private RepositoryMapper mapper;
     private String nonce;
@@ -151,38 +155,56 @@ public class AuthService {
         /** Step 5: Start a new session for the user */
         startNewSessionForUser(user, client);
         
+        /** Step 6: Create a new access token for the user */
+        AccessToken accessToken = createAccessToken(client);
+        
+        Map<String,Object> accountSummary = userService.getAccountSummary(user);
+        Map<String,Object> accountSettings = userService.getUserPreferences(user).getSettings().toMap();
         UserResponse userInfo = UserResponse.fromUser(user);
-        return new LoginResponse(userInfo, new HashMap<String, Object>(), new HashMap<String,Object>());
+        
+        return new LoginResponse(userInfo, accountSummary, accountSettings, accessToken);
         
     }
     
     
-    private void startNewSessionForUser(User user, String client) throws Exception {
+    public void startNewSessionForUser(AuthorizationTicket authTicket, String client) throws Exception {
+        UserDao userDao = mapper.userDao();
+        User user = userDao.findById(authTicket.getUserId());
+        
+        if (user == null) {
+            throw new Exception(ApplicationError.USER_NOT_FOUND);
+        }
+        
+        startNewSessionForUser(user, client);
+    }
+    
+    
+    public void startNewSessionForUser(User user, String client) throws Exception {
         UserSessionDao sessionDao = mapper.userSessionDao();
         UserSession lastSession = getLastSessionForUser(user);
         
-        boolean isActiveSession = (lastSession != null && lastSession.getStatus() == ItemStatus.ACTIVE);
-        
         /**
-         * If the last session has been active for more than 8 hours, end it and start a new one
+         * If the last session has been active for more than 8 hours, end it and 
+         * start a new one
          */
         Instant currentTimeUTC = Instant.now(Clock.systemUTC());
-        boolean hasExpired = lastSession.getStartDate().plus(8, ChronoUnit.HOURS).isBefore(currentTimeUTC);
+        boolean hasExpired = (lastSession != null && 
+                (lastSession.getStatus() == ItemStatus.EXPIRED || 
+                 lastSession.getStatus() == ItemStatus.INACTIVE ||
+                 lastSession.getStartDate().plus(8, ChronoUnit.HOURS).isBefore(currentTimeUTC)));
         
         if (hasExpired) {
             endSession(lastSession);
-            isActiveSession = false;
-        }
-        
-        if (!isActiveSession) {
+            
             UserSession newSession = new UserSession(user.getUserId(), Uuids.timeBased());
             newSession.setClient(client);
             sessionDao.create(newSession);
         }
+
     }
     
     
-    private UserSession getLastSessionForUser(User user) {
+    public UserSession getLastSessionForUser(User user) {
         UserSessionDao sessionDao = mapper.userSessionDao();
         
         PagingIterable<UserSession> userSessions = sessionDao.findAll(user.getUserId());
@@ -196,9 +218,34 @@ public class AuthService {
         UserSessionDao sessionDao = mapper.userSessionDao();
             
         session.setEndDate(Instant.now(Clock.systemUTC()));
-        session.setStatus(ItemStatus.INACTIVE);
+        session.setStatus(ItemStatus.EXPIRED);
         sessionDao.save(session);
+    }
+    
+    
+    public AccessToken createAccessToken(String clientId) throws Exception {
+        AccessTokenDao accessTokenDao = mapper.accessTokenDao();
         
+        AccessToken accessToken = new AccessToken(clientId, UUID.randomUUID().toString());
+        accessToken.setTokenKey(UUID.randomUUID().toString());
+        accessToken.setCreatedDate(Timeline.currentDateTimeUTCString());
+        accessToken.setLastModifiedDate(Timeline.currentDateTimeUTCString());
+        
+        accessTokenDao.create(accessToken);
+        
+        return accessToken;
+    }
+    
+    
+    public AccessToken getAccessTokenForClient(String clientId) {
+        return mapper.accessTokenDao().findById(clientId);
+    }
+    
+    
+    private void deactivateAccessToken(AccessToken accessToken) throws Exception {
+        accessToken.setStatus(ItemStatus.EXPIRED);
+        accessToken.setLastModifiedDate(Timeline.currentDateTimeUTCString());
+        mapper.accessTokenDao().save(accessToken);
     }
     
     
@@ -223,7 +270,7 @@ public class AuthService {
          */
         String[] parts = context.split(":");
         
-        if (parts.length != 3) {
+        if (parts.length < 3) {
             throw new Exception(ApplicationError.INVALID_PARAMETERS);
         }
         
@@ -261,10 +308,6 @@ public class AuthService {
                 preferredLocale, phoneVerification.getCode());
         smsService.sendMessageToPhone(phoneNumber, body);
         
-        System.out.println(PrintUtils.DASHES);
-        System.out.println(body);
-        System.out.println(PrintUtils.DASHES);
-        
         return phoneVerification;
         
     }
@@ -288,11 +331,9 @@ public class AuthService {
          * is formatted as follows:
          *  appId:appKey:realm
          */
-        String[] parts = context.split(":");
+        validateRequestContext(context);
         
-        if (parts.length != 3) {
-            throw new Exception(ApplicationError.INVALID_PARAMETERS);
-        }
+        String[] parts = context.split(":");
         
         String clientAppId = parts[0];
         String clientAppKey = parts[1];
@@ -335,10 +376,11 @@ public class AuthService {
      * Ends the session for the user with the specified credentials
      * 
      * @param authTicket        the authorization ticket for the request
-     * @return the user details on successful login
+     * @param client            the client making the request
+     * @return the outcome of the logout operation
      * @throws Exception if the operation fails
      */
-    public Map<String,Object> logout(AuthorizationTicket authTicket) throws Exception {
+    public Map<String,Object> logout(AuthorizationTicket authTicket, String client) throws Exception {
         UserDao userDao = mapper.userDao();
         
         User user = userDao.findById(authTicket.getUserId());
@@ -355,11 +397,79 @@ public class AuthService {
             endSession(lastSession);
         }
         
-        // deactivate token for user
+        /** deactivate the access token for the user */
+        deactivateAccessToken(getAccessTokenForClient(client));
         
         Map<String,Object> response = new HashMap<>();
         response.put("authenticated", false);
         return response;
+    }
+    
+    
+    /**
+     * Renews an access token for a client
+     * 
+     * @param authTicket    the authorization ticket for the request
+     * @param token         the current access token for the user
+     * @param context       an object that contains the request context
+     * @return a new access token for the user
+     * @throws Exception if the operation fails
+     */
+    public AccessToken renewAccessToken(AuthorizationTicket authTicket, 
+                                        String client,
+                                        String token,
+                                        String context) throws Exception {
+        // validateRequestContext(context);
+        
+        UserDao userDao = mapper.userDao();
+        User user = userDao.findById(authTicket.getUserId());
+        
+        if (user == null) {
+            throw new Exception(ApplicationError.USER_NOT_FOUND);
+        }
+        
+        /**
+         * Verify the access token to renew is actually the user's last access
+         * token; otherwise, throw an exception
+         */
+        AccessToken currentAccessToken = getAccessTokenForClient(client);
+        boolean isValidToken = (currentAccessToken != null && currentAccessToken.getTokenKey().equals(token));
+        
+        if (!isValidToken) {
+            throw new Exception(ApplicationError.INVALID_PARAMETERS);
+        }
+        
+        return createAccessToken(client);
+    }
+    
+    
+    private void validateRequestContext(String context) throws Exception {
+        /**
+         * Extract the contents of the request context. This contents is formatted 
+         * as follows:
+         *  appId:appKey:realm
+         * 
+         * If the format is incorrect, throw an exception
+         */
+        String[] parts = context.split(":");
+        
+        if (parts.length < 3) {
+            throw new Exception(ApplicationError.INVALID_PARAMETERS);
+        }
+        
+        String clientAppId = parts[0];
+        String clientAppKey = parts[1];
+        String clientRealm = parts[2];
+
+        String expectedContext = String.format("%s:%s:%s", 
+                appId, appKey, appRealm);
+        String receivedContext = String.format("%s:%s:%s", 
+            clientAppId, clientAppKey,clientRealm);
+        boolean isCorrectContext = expectedContext.equals(receivedContext);
+        
+        if (!isCorrectContext) {
+            throw new Exception(ApplicationError.INVALID_CREDENTIALS);
+        }
     }
     
 }
