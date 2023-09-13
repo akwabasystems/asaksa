@@ -167,28 +167,40 @@ public class AuthService {
     }
     
     
+    public void startNewSessionForUser(AuthorizationTicket authTicket, String client) throws Exception {
+        UserDao userDao = mapper.userDao();
+        User user = userDao.findById(authTicket.getUserId());
+        
+        if (user == null) {
+            throw new Exception(ApplicationError.USER_NOT_FOUND);
+        }
+        
+        startNewSessionForUser(user, client);
+    }
+    
+    
     public void startNewSessionForUser(User user, String client) throws Exception {
         UserSessionDao sessionDao = mapper.userSessionDao();
         UserSession lastSession = getLastSessionForUser(user);
         
-        boolean isActiveSession = (lastSession != null && lastSession.getStatus() == ItemStatus.ACTIVE);
-        
         /**
-         * If the last session has been active for more than 8 hours, end it and start a new one
+         * If the last session has been active for more than 8 hours, end it and 
+         * start a new one
          */
         Instant currentTimeUTC = Instant.now(Clock.systemUTC());
-        boolean hasExpired = lastSession.getStartDate().plus(8, ChronoUnit.HOURS).isBefore(currentTimeUTC);
+        boolean hasExpired = (lastSession != null && 
+                (lastSession.getStatus() == ItemStatus.EXPIRED || 
+                 lastSession.getStatus() == ItemStatus.INACTIVE ||
+                 lastSession.getStartDate().plus(8, ChronoUnit.HOURS).isBefore(currentTimeUTC)));
         
         if (hasExpired) {
             endSession(lastSession);
-            isActiveSession = false;
-        }
-        
-        if (!isActiveSession) {
+            
             UserSession newSession = new UserSession(user.getUserId(), Uuids.timeBased());
             newSession.setClient(client);
             sessionDao.create(newSession);
         }
+
     }
     
     
@@ -206,7 +218,7 @@ public class AuthService {
         UserSessionDao sessionDao = mapper.userSessionDao();
             
         session.setEndDate(Instant.now(Clock.systemUTC()));
-        session.setStatus(ItemStatus.INACTIVE);
+        session.setStatus(ItemStatus.EXPIRED);
         sessionDao.save(session);
     }
     
