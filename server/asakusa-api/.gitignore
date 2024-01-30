@@ -4,6 +4,10 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+### Generated or copied class or JAR files ###
+*.class
+*.jar
+
 ### STS ###
 .apt_generated
 .classpath
