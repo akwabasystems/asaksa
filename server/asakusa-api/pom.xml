@@ -133,6 +133,11 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <layers>
+                        <enabled>true</enabled>
+                    </layers>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -143,6 +148,7 @@
                 </configuration>
             </plugin>
         </plugins>
+        <finalName>asakusa-api</finalName>
     </build>
 
 </project>
