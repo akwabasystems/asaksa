@@ -1,0 +1,9 @@
+version: "3.7"
+
+services:
+  asakusa-api:
+    image: cybergeniusdz/asakusa-api:1.0
+    ports:
+      - "9443:9443"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
